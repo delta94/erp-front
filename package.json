@@ -8,9 +8,22 @@
     "start": "next start"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.2.2",
+    "@redux-requests/axios": "^1.0.0",
+    "@redux-requests/core": "^1.0.0",
+    "antd": "^4.5.2",
+    "axios": "^0.19.2",
     "next": "9.5.1",
+    "prop-types": "^15.7.2",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "react-redux": "^7.2.1",
+    "redux": "^4.0.5",
+    "redux-devtools-extension": "^2.13.8",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0",
+    "reselect": "^4.0.0",
+    "sass": "^1.26.10"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",

@@ -17,7 +17,7 @@
   ],
   "globals": {
     "Atomics": "readonly",
-    "SharedArrayBuffer": "readonly",
+    "SharedArrayBuffer": "readonly"
   },
   "parserOptions": {
     "ecmaFeatures": {
@@ -35,6 +35,11 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "react/display-name": 1
+    "react/display-name": 1,
+    "react/jsx-props-no-spreading": 0,
+    "react/forbid-prop-types": 0,
+    "quotes": ["error", "single"],
+    "jsx-quotes": ["error", "prefer-single"],
+    "semi": ["error", "always"]
   }
 }

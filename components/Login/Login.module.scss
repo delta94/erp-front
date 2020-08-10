@@ -1,0 +1,31 @@
+.left {
+
+}
+
+.right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.container {
+  flex: 1;
+  background-image: url(https://source.unsplash.com/random);
+  background-repeat: no-repeat;
+}
+
+.button {
+  width: 100%;
+}
+
+.forgot {
+  float: right;
+}
+
+.icon {
+  svg {
+    fill: #c8c8c8;
+  }
+}
