@@ -4,25 +4,18 @@ import {
   Row, Col, Form, Checkbox, Button, Input,
 } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/router';
 
-import { authorize } from '../../store/auth/actions';
 import styles from './Login.module.scss';
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { authorize } from '../../store/auth/actions';
 
 const Login = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const submit = useCallback(({ email, password }) => {
-    dispatch(authorize(email, password));
-  }, [dispatch]);
+    dispatch(authorize(email, password)).then(() => router.push('/users'));
+  }, [dispatch, router]);
 
   return (
     <Row className={styles.container}>
@@ -37,7 +30,7 @@ const Login = () => {
             name='email'
             rules={[{ required: true, message: 'Please input your Email!' }]}
           >
-            <Input prefix={<UserOutlined className={styles.icon} />} placeholder='Email' />
+            <Input prefix={<UserOutlined className={styles.icon} />} placeholder='Email' type='email' />
           </Form.Item>
           <Form.Item
             name='password'

@@ -2,10 +2,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, Tag, Button } from 'antd';
 
-import styles from './Users.module.scss';
-import { fetchUsers } from '../../store/users/actions';
-import { usersSelector } from '../../store/users/selectors';
-import InviteModal from './InviteModal/InviteModal';
+import styles from './Invitations.module.scss';
+import { fetchInvitations } from '../../store/invitations/actions';
+import { invitationsSelector } from '../../store/invitations/selectors';
+import InviteModal from '../Users/InviteModal/InviteModal';
 
 const ROLE_COLORS = {
   admin: 'cyan',
@@ -17,8 +17,6 @@ const COLUMNS = [
   {
     title: 'Name',
     dataIndex: 'name',
-    // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
-    render: (text) => <a>{text}</a>,
   },
   {
     title: 'Email',
@@ -31,15 +29,21 @@ const COLUMNS = [
     render: (text) => <Tag color={ROLE_COLORS[text] || 'default'}>{text}</Tag>,
   },
   {
+    title: 'Invited By',
+    dataIndex: 'invited_by',
+    // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
+    render: (text) => <a>{text}</a>,
+  },
+  {
     title: 'Created At',
     dataIndex: 'created_at',
   },
 ];
 
-const Users = () => {
+const Invitations = () => {
   const dispatch = useDispatch();
   const [inviteModalVisible, setInviteModalVisibility] = useState(false);
-  const [users, total, loading] = useSelector(usersSelector);
+  const [invitations, total, loading] = useSelector(invitationsSelector);
   const [pagination, setPagination] = useState({
     page: 1,
     size: 10,
@@ -54,18 +58,17 @@ const Users = () => {
   const closeInviteModal = useCallback(() => setInviteModalVisibility(false), []);
 
   useEffect(() => {
-    dispatch(fetchUsers(pagination));
+    dispatch(fetchInvitations(pagination));
   }, [dispatch, pagination]);
 
   return (
     <>
       <div className={styles.buttons}>
-        <Button type='primary'>Add</Button>
         <Button type='primary' onClick={openInviteModal}>Invite</Button>
       </div>
       <Table
         loading={loading}
-        dataSource={users}
+        dataSource={invitations}
         columns={COLUMNS}
         pagination={{
           total,
@@ -82,4 +85,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Invitations;

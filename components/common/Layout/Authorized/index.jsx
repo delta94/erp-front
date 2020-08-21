@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
 import { Layout as AntLayout } from 'antd';
 import {
   MenuUnfoldOutlined, MenuFoldOutlined,
@@ -8,9 +9,11 @@ import {
 import Head from '../Head';
 import styles from '../Layout.module.scss';
 import Sidebar from './Sidebar';
+import { authorize, initSession } from '../../../../store/auth/actions';
 
 const AuthorizedLayout = ({ title, children }) => {
   const [sidebarCollapsed, toggle] = useState(false);
+  const dispatch = useDispatch();
 
   return (
     <>
@@ -25,7 +28,6 @@ const AuthorizedLayout = ({ title, children }) => {
             })}
           </AntLayout.Header>
           <AntLayout.Content
-            className={styles.background}
             style={{
               margin: '24px 16px',
             }}

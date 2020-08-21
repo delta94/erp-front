@@ -1,5 +1,6 @@
 import thunk from 'redux-thunk';
 import axios from 'axios';
+import router from 'next/router';
 import { applyMiddleware, createStore, combineReducers } from 'redux';
 import { createLogger } from 'redux-logger';
 import { composeWithDevTools } from 'redux-devtools-extension';
@@ -8,6 +9,7 @@ import { createDriver } from '@redux-requests/axios';
 
 import auth from './auth/reducer';
 import users from './users/reducer';
+import invitations from './invitations/reducer';
 
 const loggerMiddleware = createLogger();
 
@@ -21,12 +23,17 @@ const instance = axios.create({
 
 const { requestsReducer: requests, requestsMiddleware } = handleRequests({
   driver: createDriver(instance),
+  onError: (e) => {
+    if (e.response && e.response.status === 401) router.replace('/login');
+    throw e;
+  },
 });
 
 const rootReducer = combineReducers({
   requests,
   auth,
   users,
+  invitations,
 });
 
 const middlewares = [
