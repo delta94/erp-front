@@ -1,6 +1,6 @@
-import { error, success } from '@redux-requests/core';
+import { success, error } from '@redux-requests/core';
 
-import { FETCH_INVITATIONS } from './types';
+import { FETCH_CLIENTS } from './types';
 import { reducePaginationResponse } from '../mutations';
 
 const initialState = {
@@ -11,14 +11,16 @@ const initialState = {
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_INVITATIONS:
+    case FETCH_CLIENTS:
       return { ...state, loading: true };
 
-    case success(FETCH_INVITATIONS):
+    case success(FETCH_CLIENTS):
       return reducePaginationResponse(action, state);
 
-    case error(FETCH_INVITATIONS):
-      return { ...state, loading: false };
+    case error(FETCH_CLIENTS):
+      return {
+        ...state, loading: false,
+      };
 
     default: return state;
   }

@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import Link from 'next/link';
 import { Layout as AntLayout, Menu } from 'antd';
 import {
-  UserOutlined, VideoCameraOutlined, UploadOutlined, MailOutlined,
+  UserOutlined, MailOutlined, DeploymentUnitOutlined, UnorderedListOutlined,
+  UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 
@@ -14,12 +15,12 @@ const LINKS = [
     title: 'Users',
     icon: UserOutlined,
     items: [
-      { title: 'List', icon: UserOutlined, route: '/users' },
+      { title: 'List', icon: UnorderedListOutlined, route: '/users' },
       { title: 'Invitations', icon: MailOutlined, route: '/invitations' },
     ],
   },
-  { title: 'Test', icon: VideoCameraOutlined, route: '/test' },
-  { title: 'Test 2', icon: UploadOutlined, route: '/test-2' },
+  { title: 'Projects', icon: DeploymentUnitOutlined, route: '/projects' },
+  { title: 'Clients', icon: UsergroupAddOutlined, route: '/clients' },
 ];
 
 const Sidebar = ({ collapsed }) => {

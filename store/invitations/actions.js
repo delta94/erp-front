@@ -24,7 +24,7 @@ export const inviteUsers = (data) => (
     type: INVITE_USERS,
     request: {
       method: 'POST',
-      url: '/invitations/invite',
+      url: '/invitations',
       data,
     },
   }

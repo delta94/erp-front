@@ -16,7 +16,7 @@ import { userRolesSelector } from '../../../store/users/selectors';
 import { inviteUsers } from '../../../store/invitations/actions';
 import { parseErrors } from '../../../utils';
 
-const InviteModal = ({ visible, onCancel }) => {
+const InviteModal = ({ visible, onCancel, onFinish }) => {
   const [form] = Form.useForm();
   const [roles, rolesLoading] = useSelector(userRolesSelector);
   const dispatch = useDispatch();
@@ -32,6 +32,7 @@ const InviteModal = ({ visible, onCancel }) => {
       } else if (error) {
         message.error(error.message);
       } else {
+        onFinish();
         message.success(data.message);
       }
     } catch (e) {
@@ -39,7 +40,7 @@ const InviteModal = ({ visible, onCancel }) => {
     } finally {
       setSubmitting(false);
     }
-  }, [form, dispatch]);
+  }, [form, dispatch, onFinish]);
 
   const renderField = useCallback((field, idx, arr, removeField) => (
     <Form.Item key={idx.toString()} className={styles.listItem}>
@@ -180,10 +181,12 @@ const InviteModal = ({ visible, onCancel }) => {
 InviteModal.propTypes = {
   visible: PropTypes.bool.isRequired,
   onCancel: PropTypes.func,
+  onFinish: PropTypes.func,
 };
 
 InviteModal.defaultProps = {
   onCancel: () => {},
+  onFinish: () => {},
 };
 
 export default InviteModal;

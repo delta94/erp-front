@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Table, Tag, Button } from 'antd';
 
 import styles from './Invitations.module.scss';
+import InviteModal from '../Users/InviteModal/InviteModal';
 import { fetchInvitations } from '../../store/invitations/actions';
 import { invitationsSelector } from '../../store/invitations/selectors';
-import InviteModal from '../Users/InviteModal/InviteModal';
 
 const ROLE_COLORS = {
   admin: 'cyan',
@@ -57,9 +57,13 @@ const Invitations = () => {
 
   const closeInviteModal = useCallback(() => setInviteModalVisibility(false), []);
 
-  useEffect(() => {
+  const requestInvitations = useCallback(() => {
     dispatch(fetchInvitations(pagination));
   }, [dispatch, pagination]);
+
+  useEffect(() => {
+    requestInvitations();
+  }, [requestInvitations]);
 
   return (
     <>
@@ -80,6 +84,7 @@ const Invitations = () => {
       <InviteModal
         visible={inviteModalVisible}
         onCancel={closeInviteModal}
+        onFinish={requestInvitations}
       />
     </>
   );

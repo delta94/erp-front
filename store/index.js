@@ -10,6 +10,8 @@ import { createDriver } from '@redux-requests/axios';
 import auth from './auth/reducer';
 import users from './users/reducer';
 import invitations from './invitations/reducer';
+import projects from './projects/reducer';
+import clients from './clients/reducer';
 
 const loggerMiddleware = createLogger();
 
@@ -34,6 +36,8 @@ const rootReducer = combineReducers({
   auth,
   users,
   invitations,
+  projects,
+  clients,
 });
 
 const middlewares = [

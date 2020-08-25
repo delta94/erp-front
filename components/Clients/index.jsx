@@ -1,17 +1,17 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Table, Tag, Button } from 'antd';
+import { Table, Button, Tag } from 'antd';
+import { MinusOutlined } from '@ant-design/icons';
 
 import Link from 'next/link';
-import styles from './Users.module.scss';
-import { fetchUsers } from '../../store/users/actions';
-import { usersSelector } from '../../store/users/selectors';
-import InviteModal from './InviteModal/InviteModal';
+import styles from './Clients.module.scss';
+import { clientsSelector } from '../../store/clients/selectors';
+import { fetchClients } from '../../store/clients/actions';
 
-const ROLE_COLORS = {
-  admin: 'cyan',
-  manager: 'magenta',
-  developer: 'geekblue',
+const ORIGIN_COLORS = {
+  upwork: 'green',
+  freelancer: 'geekblue',
+  linkedin: 'blue',
 };
 
 const COLUMNS = [
@@ -26,10 +26,18 @@ const COLUMNS = [
     dataIndex: 'email',
   },
   {
-    title: 'Role',
-    dataIndex: 'role',
+    title: 'Found On',
+    dataIndex: 'found_on',
     // eslint-disable-next-line react/display-name
-    render: (text) => <Tag color={ROLE_COLORS[text] || 'default'}>{text}</Tag>,
+    render: (origin) => <Tag color={ORIGIN_COLORS[origin]}>{origin}</Tag>,
+  },
+  {
+    title: 'Notes',
+    dataIndex: 'notes',
+    // eslint-disable-next-line react/display-name
+    render: (notes) => (notes
+      ? notes.map((note, idx) => <p key={idx.toString()}>{note}</p>)
+      : <MinusOutlined />),
   },
   {
     title: 'Created At',
@@ -37,10 +45,9 @@ const COLUMNS = [
   },
 ];
 
-const Users = () => {
+const Clients = () => {
   const dispatch = useDispatch();
-  const [inviteModalVisible, setInviteModalVisibility] = useState(false);
-  const [users, total, loading] = useSelector(usersSelector);
+  const [clients, total, loading] = useSelector(clientsSelector);
   const [pagination, setPagination] = useState({
     page: 1,
     size: 10,
@@ -50,28 +57,23 @@ const Users = () => {
     setPagination({ page, size });
   }, []);
 
-  const openInviteModal = useCallback(() => setInviteModalVisibility(true), []);
-
-  const closeInviteModal = useCallback(() => setInviteModalVisibility(false), []);
-
   useEffect(() => {
-    dispatch(fetchUsers(pagination));
+    dispatch(fetchClients(pagination));
   }, [dispatch, pagination]);
 
   return (
     <>
       <div className={styles.buttons}>
         <Button type='primary'>
-          <Link href='/users/new'>
+          <Link href='/clients/new'>
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a>Add</a>
           </Link>
         </Button>
-        <Button type='primary' onClick={openInviteModal}>Invite</Button>
       </div>
       <Table
         loading={loading}
-        dataSource={users}
+        dataSource={clients}
         columns={COLUMNS}
         pagination={{
           total,
@@ -80,12 +82,8 @@ const Users = () => {
           onChange: handlePaginationChange,
         }}
       />
-      <InviteModal
-        visible={inviteModalVisible}
-        onCancel={closeInviteModal}
-      />
     </>
   );
 };
 
-export default Users;
+export default Clients;

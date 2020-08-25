@@ -1,8 +1,10 @@
 import { success, error } from '@redux-requests/core';
+
 import {
   FETCH_USER_ROLES,
   FETCH_USERS,
 } from './types';
+import { reducePaginationResponse } from '../mutations';
 
 const initialState = {
   data: [],
@@ -21,15 +23,7 @@ export const reducer = (state = initialState, action) => {
       return { ...state, rolesLoading: true };
 
     case success(FETCH_USERS):
-      return {
-        ...state,
-        data: action.response.data.data.map((user) => ({
-          key: user.id,
-          ...user,
-        })),
-        total: action.response.data.total,
-        loading: false,
-      };
+      return reducePaginationResponse(action, state);
 
     case success(FETCH_USER_ROLES):
       return {
