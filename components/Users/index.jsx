@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, Tag, Button } from 'antd';
-
 import Link from 'next/link';
+
 import styles from './Users.module.scss';
 import { fetchUsers } from '../../store/users/actions';
 import { usersSelector } from '../../store/users/selectors';
@@ -14,12 +14,19 @@ const ROLE_COLORS = {
   developer: 'geekblue',
 };
 
+const STATUS_COLORS = {
+  'day off': 'cyan',
+  active: 'green',
+  vacation: 'geekblue',
+  'on sick leave': 'red',
+};
+
 const COLUMNS = [
   {
     title: 'Name',
     dataIndex: 'name',
     // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
-    render: (text) => <a>{text}</a>,
+    render: (text, { id }) => <Link href='/users/[id]' as={`/users/${id}`}><a>{text}</a></Link>,
   },
   {
     title: 'Email',
@@ -30,6 +37,12 @@ const COLUMNS = [
     dataIndex: 'role',
     // eslint-disable-next-line react/display-name
     render: (text) => <Tag color={ROLE_COLORS[text] || 'default'}>{text}</Tag>,
+  },
+  {
+    title: 'Status',
+    dataIndex: 'status',
+    // eslint-disable-next-line react/display-name
+    render: (text) => <Tag color={STATUS_COLORS[text] || 'default'}>{text}</Tag>,
   },
   {
     title: 'Created At',

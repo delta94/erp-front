@@ -1,28 +1,34 @@
 import { success, error } from '@redux-requests/core';
 import {
-  LOGIN,
+  FETCH_ACCOUNT, LOGIN, LOGOUT,
 } from './types';
 
 const initialState = {
   user: null,
-  isAuthorized: false,
   loading: false,
-  error: null,
 };
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case LOGIN:
-      return { ...state, error: null, loading: true };
+    case FETCH_ACCOUNT:
+      return { ...state, loading: true };
+
+    case success(LOGOUT):
+      return { ...initialState };
 
     case success(LOGIN):
       return {
-        ...state, user: action.response.data.user, loading: false, isAuthorized: true,
+        ...state, user: action.response.data.user, loading: false,
       };
 
+    case success(FETCH_ACCOUNT):
+      return { ...state, user: action.response.data, loading: false };
+
+    case error(FETCH_ACCOUNT):
     case error(LOGIN):
       return {
-        ...state, loading: false, error: action.error, isAuthorized: false,
+        ...state, loading: false,
       };
 
     default: return state;

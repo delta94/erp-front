@@ -17,9 +17,9 @@ import { inviteUsers } from '../../../store/invitations/actions';
 import { parseErrors } from '../../../utils';
 
 const InviteModal = ({ visible, onCancel, onFinish }) => {
+  const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [roles, rolesLoading] = useSelector(userRolesSelector);
-  const dispatch = useDispatch();
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = useCallback(async () => {

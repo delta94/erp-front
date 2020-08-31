@@ -12,11 +12,12 @@ import users from './users/reducer';
 import invitations from './invitations/reducer';
 import projects from './projects/reducer';
 import clients from './clients/reducer';
+import { BASE_URL } from '../utils/constants';
 
 const loggerMiddleware = createLogger();
 
 const instance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
+  baseURL: BASE_URL,
   withCredentials: true,
   headers: {
     Accept: 'application/json',

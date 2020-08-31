@@ -1,19 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
+import classNames from 'classnames';
 import { Layout as AntLayout } from 'antd';
 import {
   MenuUnfoldOutlined, MenuFoldOutlined,
 } from '@ant-design/icons';
+import { useDispatch, useSelector } from 'react-redux';
 
-import Head from '../Head';
 import styles from '../Layout.module.scss';
+import Head from '../Head';
 import Sidebar from './Sidebar';
-import { authorize, initSession } from '../../../../store/auth/actions';
+import AvatarArea from './AvatarArea';
+import { accountSelector } from '../../../../store/auth/selectors';
+import { fetchAccount } from '../../../../store/auth/actions';
 
 const AuthorizedLayout = ({ title, children }) => {
-  const [sidebarCollapsed, toggle] = useState(false);
   const dispatch = useDispatch();
+  const user = useSelector(accountSelector);
+  const [sidebarCollapsed, toggle] = useState(false);
+
+  useEffect(() => {
+    if (!user) dispatch(fetchAccount());
+  }, [user, dispatch]);
 
   return (
     <>
@@ -21,11 +29,12 @@ const AuthorizedLayout = ({ title, children }) => {
       <AntLayout className={styles.container}>
         <Sidebar collapsed={sidebarCollapsed} />
         <AntLayout className='site-layout'>
-          <AntLayout.Header className={styles.background} style={{ padding: 0 }}>
+          <AntLayout.Header className={classNames(styles.background, styles.header)}>
             {React.createElement(sidebarCollapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
               className: styles.trigger,
               onClick: () => toggle((state) => !state),
             })}
+            <AvatarArea />
           </AntLayout.Header>
           <AntLayout.Content
             style={{

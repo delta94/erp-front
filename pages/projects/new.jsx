@@ -1,8 +1,9 @@
 import AuthorizedLayout from '../../components/common/Layout/Authorized';
+import AddProject from '../../components/Projects/AddProject';
 
 const AddProjectPage = () => (
   <AuthorizedLayout title='dygit'>
-    new proj
+    <AddProject />
   </AuthorizedLayout>
 );
 

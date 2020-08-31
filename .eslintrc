@@ -40,6 +40,7 @@
     "react/forbid-prop-types": 0,
     "quotes": ["error", "single"],
     "jsx-quotes": ["error", "prefer-single"],
-    "semi": ["error", "always"]
+    "semi": ["error", "always"],
+    "max-len": ["error", { "code": 120 }]
   }
 }

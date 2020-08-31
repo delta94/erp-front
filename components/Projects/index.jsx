@@ -1,57 +1,65 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Table, Button, Tag } from 'antd';
+import {
+  Table, Button, Badge,
+} from 'antd';
 import Link from 'next/link';
 
 import styles from './Projects.module.scss';
 import { projectsSelector } from '../../store/projects/selectors';
 import { fetchProjects } from '../../store/projects/actions';
+import { STATUS_COLORS } from '../../utils/constants';
 
 const COLUMNS = [
   {
-    title: 'Name',
-    dataIndex: 'name',
+    title: 'Title',
+    dataIndex: 'title',
+    // eslint-disable-next-line jsx-a11y/anchor-is-valid,react/display-name
+    render: (text, { id }) => <Link href='/projects/[id]' as={`/projects/${id}`}><a>{text}</a></Link>,
   },
   {
     title: 'Developers',
     dataIndex: 'developers',
-    // eslint-disable-next-line jsx-a11y/anchor-is-valid
-    render: (data) => data.map((item, idx) => (<a key={idx.toString()}>{item.name}</a>)),
+    render: (data) => data.map((item, idx) => (
+      <Link key={idx.toString()} href='/users/[id]' as={`/users/${item.id}`}>
+        { /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
+        <a>{item.name}</a>
+      </Link>
+    )),
   },
   {
     title: 'Managers',
     dataIndex: 'managers',
-    // eslint-disable-next-line jsx-a11y/anchor-is-valid
-    render: (data) => data.map((item, idx) => (<a key={idx.toString()}>{item.name}</a>)),
+    render: (data) => data.map((item, idx) => (
+      <Link key={idx.toString()} href='/users/[id]' as={`/users/${item.id}`}>
+        { /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
+        <a>{item.name}</a>
+      </Link>
+    )),
   },
   {
     title: 'Clients',
     dataIndex: 'clients',
-    // eslint-disable-next-line jsx-a11y/anchor-is-valid
-    render: (data) => data.map((item, idx) => (<a key={idx.toString()}>{item.name}</a>)),
+    render: (data) => data.map((item, idx) => (
+      <Link key={idx.toString()} href='/clients/[id]' as={`/clients/${item.id}`}>
+        { /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
+        <a>{item.name}</a>
+      </Link>
+    )),
   },
   {
-    title: 'Salary Based',
-    dataIndex: 'is_salary_based',
-    render: (val) => (val ? 'Yes' : 'No'),
-  },
-  {
-    title: 'Rate',
-    dataIndex: 'rate',
-  },
-  {
-    title: 'Tags',
-    dataIndex: 'tags',
+    title: 'Status',
+    dataIndex: 'status',
     // eslint-disable-next-line react/display-name
-    render: (tags) => (
-      <>
-        {tags.map((tag, idx) => <Tag key={idx.toString()} color={tag.color}>{tag.name}</Tag>)}
-      </>
-    ),
+    render: (status) => <Badge text={status} status={STATUS_COLORS[status]} className={styles.status} />,
   },
   {
     title: 'Created At',
     dataIndex: 'created_at',
+  },
+  {
+    title: 'Starting At',
+    dataIndex: 'start_date',
   },
 ];
 
@@ -85,6 +93,7 @@ const Projects = () => {
         loading={loading}
         dataSource={projects}
         columns={COLUMNS}
+        scroll={{ x: 600 }}
         pagination={{
           total,
           showSizeChanger: true,

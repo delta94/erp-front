@@ -1,5 +1,5 @@
 import {
-  INIT_SESSION, LOGIN,
+  FETCH_ACCOUNT, INIT_SESSION, LOGIN, LOGOUT,
 } from './types';
 
 export const login = (email, password) => ({
@@ -25,3 +25,19 @@ export const authorize = (email, password) => async (dispatch) => {
   await dispatch(initSession());
   return dispatch(login(email, password));
 };
+
+export const fetchAccount = () => ({
+  type: FETCH_ACCOUNT,
+  request: {
+    method: 'GET',
+    url: '/user',
+  },
+});
+
+export const logout = () => ({
+  type: LOGOUT,
+  request: {
+    method: 'GET',
+    url: '/logout',
+  },
+});

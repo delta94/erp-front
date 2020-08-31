@@ -1,43 +1,29 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, Button, Tag } from 'antd';
-import { MinusOutlined } from '@ant-design/icons';
-
 import Link from 'next/link';
+
 import styles from './Clients.module.scss';
 import { clientsSelector } from '../../store/clients/selectors';
 import { fetchClients } from '../../store/clients/actions';
-
-const ORIGIN_COLORS = {
-  upwork: 'green',
-  freelancer: 'geekblue',
-  linkedin: 'blue',
-};
+import { ORIGIN_COLORS } from '../../utils/constants';
 
 const COLUMNS = [
   {
     title: 'Name',
     dataIndex: 'name',
     // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
-    render: (text) => <a>{text}</a>,
+    render: (text, { id }) => <Link href='/clients/[id]' as={`/clients/${id}`}><a>{text}</a></Link>,
   },
   {
     title: 'Email',
     dataIndex: 'email',
   },
   {
-    title: 'Found On',
-    dataIndex: 'found_on',
+    title: 'Origin',
+    dataIndex: 'origin',
     // eslint-disable-next-line react/display-name
     render: (origin) => <Tag color={ORIGIN_COLORS[origin]}>{origin}</Tag>,
-  },
-  {
-    title: 'Notes',
-    dataIndex: 'notes',
-    // eslint-disable-next-line react/display-name
-    render: (notes) => (notes
-      ? notes.map((note, idx) => <p key={idx.toString()}>{note}</p>)
-      : <MinusOutlined />),
   },
   {
     title: 'Created At',

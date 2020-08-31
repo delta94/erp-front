@@ -14,8 +14,28 @@
 
 .trigger {
   font-size: 18px;
-  line-height: 64px;
-  padding: 0 24px;
   cursor: pointer;
   transition: color 0.3s;
+}
+
+.header {
+  height: 48px;
+  line-height: 48px;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15px;
+}
+
+.avatarWrap {
+  cursor: pointer;
+  transition: .2s all;
+
+  span {
+    margin: 0 5px;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, .025);
+  }
 }
