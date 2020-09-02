@@ -12,7 +12,7 @@ import {
   COUNTRIES, CLIENT_FIELD_TYPE, URLS, BASE_URL,
 } from '../../utils/constants';
 import {
-  getXsrfToken, parseErrors, toUpperCase, normFile, filterByLabel,
+  getXsrfToken, parseErrors, ucFirst, normFile, filterByLabel,
 } from '../../utils';
 import {
   addClient, fetchClientFieldTypes, fetchClientOrigins,
@@ -32,7 +32,7 @@ const AddClient = () => {
 
   const originOptions = useMemo(() => origins.map((o) => ({ value: o, label: o })), [origins]);
 
-  const fieldTypeOptions = useMemo(() => fieldTypes.map((f) => ({ value: f, label: toUpperCase(f) })), [fieldTypes]);
+  const fieldTypeOptions = useMemo(() => fieldTypes.map((f) => ({ value: f, label: ucFirst(f) })), [fieldTypes]);
 
   const renderLinksField = useCallback((fields, { remove }) => fields.map((field, idx) => (
     <Row key={idx.toString()} gutter={10}>

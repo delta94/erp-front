@@ -12,6 +12,9 @@ import users from './users/reducer';
 import invitations from './invitations/reducer';
 import projects from './projects/reducer';
 import clients from './clients/reducer';
+import payments from './payments/reducer';
+import expenses from './expenses/reducer';
+import accounts from './accounts/reducer';
 import { BASE_URL } from '../utils/constants';
 
 const loggerMiddleware = createLogger();
@@ -39,6 +42,9 @@ const rootReducer = combineReducers({
   invitations,
   projects,
   clients,
+  payments,
+  expenses,
+  accounts,
 });
 
 const middlewares = [

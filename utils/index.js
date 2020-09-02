@@ -63,7 +63,7 @@ export function parseErrors(errors, replaceMessageWith = null, values = null) {
 /**
  * @param {String} str
  */
-export function toUpperCase(str) {
+export function ucFirst(str) {
   return str.slice(0, 1).toUpperCase() + str.slice(1);
 }
 
@@ -130,4 +130,10 @@ export function normFile(e) {
 
 export function filterByLabel(val, option) {
   return option.label.match(new RegExp(val, 'ig'));
+}
+
+export function mapOptions(array) {
+  return array.map((item) => (typeof item === 'object'
+    ? { label: item.name, value: item.id }
+    : { label: item, value: item }));
 }

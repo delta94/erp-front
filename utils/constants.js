@@ -327,6 +327,7 @@ export const ORIGIN_COLORS = {
   freelancer: 'geekblue',
   linkedin: 'blue',
   reddit: 'orange',
+  payoneer: 'orange',
 };
 
 export const STATUS_COLORS = {
@@ -336,8 +337,35 @@ export const STATUS_COLORS = {
   pending: 'warning',
 };
 
+export const PAYMENT_STATUS_COLORS = {
+  upcoming: 'warning',
+  'on the way': 'processing',
+  deposited: 'success',
+  withdrawn: 'default',
+  failed: 'error',
+  paid: 'success',
+};
+
 export const RESPONSE_MODE = {
   SIMPLIFIED: 'simplified',
   FULL: 'full',
   MINIMAL: 'minimal',
+};
+
+export const CURRENCY_SYMBOLS = {
+  usd: '$', // US Dollar
+  uah: '₴', // Ukrainian Hryvnia
+  eur: '€', // Euro
+  crc: '₡', // Costa Rican Colón
+  gbp: '£', // British Pound Sterling
+  ils: '₪', // Israeli New Sheqel
+  inr: '₹', // Indian Rupee
+  jpy: '¥', // Japanese Yen
+  krw: '₩', // South Korean Won
+  ngn: '₦', // Nigerian Naira
+  php: '₱', // Philippine Peso
+  pln: 'zł', // Polish Zloty
+  pyg: '₲', // Paraguayan Guarani
+  thb: '฿', // Thai Baht
+  vnd: '₫', // Vietnamese Dong
 };

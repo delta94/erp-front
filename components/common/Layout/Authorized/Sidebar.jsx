@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import Link from 'next/link';
 import { Layout as AntLayout, Menu } from 'antd';
 import {
-  MailOutlined, DeploymentUnitOutlined, UnorderedListOutlined, TeamOutlined, SolutionOutlined,
+  MailOutlined, DeploymentUnitOutlined, UnorderedListOutlined, TeamOutlined, SolutionOutlined, DollarCircleOutlined,
+  BankOutlined, WalletOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 
@@ -20,6 +21,14 @@ const LINKS = [
   },
   { title: 'Projects', icon: DeploymentUnitOutlined, route: '/projects' },
   { title: 'Clients', icon: SolutionOutlined, route: '/clients' },
+  {
+    title: 'Budget',
+    icon: BankOutlined,
+    items: [
+      { title: 'Payments', route: '/payments', icon: DollarCircleOutlined },
+      { title: 'Expenses', route: '/expenses', icon: WalletOutlined },
+    ],
+  },
 ];
 
 const Sidebar = ({ collapsed }) => {

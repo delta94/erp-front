@@ -13,7 +13,7 @@ import {
   URLS, BASE_URL, STATUS_COLORS, RESPONSE_MODE,
 } from '../../utils/constants';
 import {
-  getXsrfToken, parseErrors, normFile, toUpperCase, filterByLabel,
+  getXsrfToken, parseErrors, normFile, ucFirst, filterByLabel, mapOptions,
 } from '../../utils';
 import { fetchClients } from '../../store/clients/actions';
 import { projectStatusesSelector } from '../../store/projects/selectors';
@@ -35,23 +35,19 @@ const AddProject = () => {
 
   const statusOptions = useMemo(() => statuses.map((s, idx) => (
     <Select.Option key={idx.toString()} value={s}>
-      <Badge status={STATUS_COLORS[s]} text={toUpperCase(s)} className={styles.badge} />
+      <Badge status={STATUS_COLORS[s]} text={ucFirst(s)} className={styles.badge} />
     </Select.Option>
   )), [statuses]);
 
-  const mapOptions = useCallback((array) => array.map((item) => ({
-    label: item.name, value: item.id,
-  })), []);
-
-  const clientOptions = useMemo(() => mapOptions(clients), [mapOptions, clients]);
+  const clientOptions = useMemo(() => mapOptions(clients), [clients]);
 
   const developerOptions = useMemo(() => mapOptions(
     users.filter((u) => u.role === 'developer'),
-  ), [mapOptions, users]);
+  ), [users]);
 
   const managerOptions = useMemo(() => mapOptions(
     users.filter((u) => u.role === 'manager'),
-  ), [mapOptions, users]);
+  ), [users]);
 
   const handleSubmit = useCallback(async () => {
     try {
