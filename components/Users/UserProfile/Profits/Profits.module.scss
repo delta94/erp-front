@@ -1,0 +1,33 @@
+.card {
+  border-radius: 4px;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 400;
+}
+
+.subtitle {
+  color: #c8c8c8;
+  font-size: 0.875rem;
+}
+
+.description {
+  font-size: 0.875rem;
+}
+
+.titleIcon {
+  padding: 0;
+  margin-bottom: 4px;
+  svg {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+.titleWrap {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}

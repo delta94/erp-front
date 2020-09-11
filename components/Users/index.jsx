@@ -1,82 +1,70 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, {
+  useEffect, useState, useCallback, useMemo,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, Tag, Button } from 'antd';
 import Link from 'next/link';
 
 import styles from './Users.module.scss';
+import InviteModal from './InviteModal/InviteModal';
+import usePagination from '../../utils/hooks/usePagination';
 import { fetchUsers } from '../../store/users/actions';
 import { usersSelector } from '../../store/users/selectors';
-import InviteModal from './InviteModal/InviteModal';
-
-const ROLE_COLORS = {
-  admin: 'cyan',
-  manager: 'magenta',
-  developer: 'geekblue',
-};
-
-const STATUS_COLORS = {
-  'day off': 'cyan',
-  active: 'green',
-  vacation: 'geekblue',
-  'on sick leave': 'red',
-};
-
-const COLUMNS = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
-    render: (text, { id }) => <Link href='/users/[id]' as={`/users/${id}`}><a>{text}</a></Link>,
-  },
-  {
-    title: 'Email',
-    dataIndex: 'email',
-  },
-  {
-    title: 'Role',
-    dataIndex: 'role',
-    // eslint-disable-next-line react/display-name
-    render: (text) => <Tag color={ROLE_COLORS[text] || 'default'}>{text}</Tag>,
-  },
-  {
-    title: 'Status',
-    dataIndex: 'status',
-    // eslint-disable-next-line react/display-name
-    render: (text) => <Tag color={STATUS_COLORS[text] || 'default'}>{text}</Tag>,
-  },
-  {
-    title: 'Created At',
-    dataIndex: 'created_at',
-  },
-];
+import { RESPONSE_MODE, USER_ROLE_COLORS, USER_STATUS_COLORS } from '../../utils/constants';
+import { applyFilter, mapFilters } from '../../utils';
 
 const Users = () => {
   const dispatch = useDispatch();
   const [inviteModalVisible, setInviteModalVisibility] = useState(false);
-  const [users, total, loading] = useSelector(usersSelector);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    size: 10,
-  });
-
-  const handlePaginationChange = useCallback((page, size) => {
-    setPagination({ page, size });
-  }, []);
+  const [users, total, loading, filtersData] = useSelector(usersSelector);
+  const [pagination, paginationOptions] = usePagination();
+  const [filters, setFilters] = useState([]);
 
   const openInviteModal = useCallback(() => setInviteModalVisibility(true), []);
 
   const closeInviteModal = useCallback(() => setInviteModalVisibility(false), []);
 
+  const columns = useMemo(() => [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      render: (text, { id }) => <Link href='/users/[id]' as={`/users/${id}`}><a>{text}</a></Link>,
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+    },
+    {
+      title: 'Role',
+      dataIndex: 'role',
+      render: (text) => <Tag color={USER_ROLE_COLORS[text] || 'default'}>{text}</Tag>,
+      filters: applyFilter(filtersData.role),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      render: (text) => <Tag color={USER_STATUS_COLORS[text] || 'default'}>{text}</Tag>,
+      filters: applyFilter(filtersData.status),
+    },
+    {
+      title: 'Created At',
+      dataIndex: 'created_at',
+    },
+  ], [filtersData]);
+
+  const onChange = useCallback((p, f, sorter, source) => {
+    if (source.action === 'filter') setFilters(mapFilters(f));
+  }, []);
+
   useEffect(() => {
-    dispatch(fetchUsers(pagination));
-  }, [dispatch, pagination]);
+    dispatch(fetchUsers({ ...pagination, filters, mode: RESPONSE_MODE.SIMPLIFIED }));
+  }, [dispatch, pagination, filters]);
 
   return (
     <>
       <div className={styles.buttons}>
         <Button type='primary'>
           <Link href='/users/new'>
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a>Add</a>
           </Link>
         </Button>
@@ -85,12 +73,11 @@ const Users = () => {
       <Table
         loading={loading}
         dataSource={users}
-        columns={COLUMNS}
+        columns={columns}
+        onChange={onChange}
         pagination={{
           total,
-          showSizeChanger: true,
-          onShowSizeChange: handlePaginationChange,
-          onChange: handlePaginationChange,
+          ...paginationOptions,
         }}
       />
       <InviteModal

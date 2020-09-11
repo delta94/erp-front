@@ -9,6 +9,7 @@ import styles from './Projects.module.scss';
 import { projectsSelector } from '../../store/projects/selectors';
 import { fetchProjects } from '../../store/projects/actions';
 import { STATUS_COLORS } from '../../utils/constants';
+import usePagination from '../../utils/hooks/usePagination';
 
 const COLUMNS = [
   {
@@ -66,14 +67,7 @@ const COLUMNS = [
 const Projects = () => {
   const dispatch = useDispatch();
   const [projects, total, loading] = useSelector(projectsSelector);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    size: 10,
-  });
-
-  const handlePaginationChange = useCallback((page, size) => {
-    setPagination({ page, size });
-  }, []);
+  const [pagination, paginationOptions] = usePagination();
 
   useEffect(() => {
     dispatch(fetchProjects(pagination));
@@ -96,9 +90,7 @@ const Projects = () => {
         scroll={{ x: 600 }}
         pagination={{
           total,
-          showSizeChanger: true,
-          onShowSizeChange: handlePaginationChange,
-          onChange: handlePaginationChange,
+          ...paginationOptions,
         }}
       />
     </>

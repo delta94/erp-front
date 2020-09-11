@@ -9,10 +9,10 @@ import {
 } from '@ant-design/icons';
 
 import styles from '../Clients.module.scss';
+import SimplifiedProjectsList from '../../common/SimplifiedProjectsList';
 import { fetchClient } from '../../../store/clients/actions';
 import { clientSelector } from '../../../store/clients/selectors';
 import { ORIGIN_COLORS } from '../../../utils/constants';
-import SimplifiedProjectsList from './SimplifiedProjectsList';
 
 const CARD_STYLE = {
   headStyle: {
@@ -27,8 +27,17 @@ const CARD_STYLE = {
 };
 
 const TABS = [
-  { title: 'Projects', icon: ProjectOutlined, component: SimplifiedProjectsList },
-  { title: 'Invoices', icon: ScheduleOutlined, component: () => 'tab 2' },
+  {
+    title: 'Projects',
+    icon: ProjectOutlined,
+    // eslint-disable-next-line react/prop-types
+    component: ({ client }) => <SimplifiedProjectsList data={client.projects || []} />,
+  },
+  {
+    title: 'Invoices',
+    icon: ScheduleOutlined,
+    component: () => 'tab 2',
+  },
 ];
 
 const ClientProfile = () => {
@@ -50,9 +59,9 @@ const ClientProfile = () => {
         </span>
       )}
     >
-      <tab.component />
+      <tab.component client={client} />
     </Tabs.TabPane>
-  ), []);
+  ), [client]);
 
   const content = useMemo(() => (
     <Row gutter={[16, 16]}>
@@ -67,7 +76,7 @@ const ClientProfile = () => {
             >
               <Skeleton loading={loading} avatar active>
                 <div className={styles.avatarWrap}>
-                  <Avatar size={50} src={client?.avatar?.url}>U</Avatar>
+                  <Avatar size={50} src={client.avatar?.url}>U</Avatar>
                   <Typography.Text strong className={styles.name}>
                     { client?.name }
                     <br />
@@ -86,19 +95,19 @@ const ClientProfile = () => {
               <Skeleton loading={loading} active>
                 <Typography.Text className={styles.description} copyable>
                   <HomeOutlined />
-                  { client?.full_address }
+                  { client.full_address }
                 </Typography.Text>
-                <Typography.Link href={`mailto:${client?.email}`} className={styles.description} copyable>
+                <Typography.Link href={`mailto:${client.email}`} className={styles.description} copyable>
                   <MailOutlined />
-                  { client?.email }
+                  { client.email }
                 </Typography.Link>
-                { client?.phone && (
+                { client.phone && (
                   <Typography.Link href={`tel:${client.phone}`} className={styles.description} copyable>
                     <PhoneOutlined />
                     { client.phone }
                   </Typography.Link>
                 ) }
-                { client?.websites?.length ? client.websites.map((website, idx) => (
+                { client.websites?.length ? client.websites.map((website, idx) => (
                   <Typography.Link
                     key={idx.toString()}
                     href={`https://${website}`}
@@ -121,7 +130,7 @@ const ClientProfile = () => {
             >
               <Skeleton loading={loading} active>
                 {
-                  !client?.links?.length
+                  !client.links?.length
                     ? <Empty description={false} />
                     : client.links.map((link, idx) => (
                       <Typography.Link

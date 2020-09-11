@@ -1,4 +1,4 @@
-import { EXTENSIONS } from './constants';
+import { CURRENCY_SYMBOLS, EXTENSIONS } from './constants';
 
 /**
  *
@@ -9,6 +9,7 @@ import { EXTENSIONS } from './constants';
  * @property {String} [mode] Response mode
  * @property {String} [searchTerm] Search term to filter result
  * @property {Boolean} [descending] Records order
+ * @property {Object} [filters] Filters object
  *
  */
 
@@ -17,12 +18,13 @@ import { EXTENSIONS } from './constants';
  */
 export function composeQuery(queryObj = { page: 1, size: 10 }) {
   const {
-    page = 1, size = 10, mode, roles,
+    page = 1, size = 10, mode, roles, filters = [],
   } = queryObj;
   const query = { skip: (page * size) - size };
   if (size > -1) query.limit = size;
   if (mode) query.mode = mode;
-  if (roles) query.roles = roles;
+  if (roles) query.role = roles;
+  if (filters) filters.forEach((filter) => { query[filter.name] = filter.value; });
   return query;
 }
 
@@ -134,6 +136,23 @@ export function filterByLabel(val, option) {
 
 export function mapOptions(array) {
   return array.map((item) => (typeof item === 'object'
-    ? { label: item.name, value: item.id }
+    ? { label: (item.name ?? item.title), value: item.id }
     : { label: item, value: item }));
+}
+
+export function formatCurrency(amount, symbol = CURRENCY_SYMBOLS.usd) {
+  return `${symbol} ${new Intl.NumberFormat().format(amount)}`;
+}
+
+export function applyFilter(data) {
+  return data ? data.map((item) => ({ text: item, value: item })) : false;
+}
+
+/**
+ * Map ant design Table filter object
+ *
+ * @param {Object} filters
+ */
+export function mapFilters(filters) {
+  return Object.keys(filters).map((item) => ({ name: item, value: filters[item] }));
 }

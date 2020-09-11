@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 export const COUNTRIES = [
@@ -369,3 +371,42 @@ export const CURRENCY_SYMBOLS = {
   thb: '฿', // Thai Baht
   vnd: '₫', // Vietnamese Dong
 };
+
+export const INVITATION_STATUS_COLORS = {
+  pending: 'processing',
+  accepted: 'success',
+  expired: 'error',
+};
+
+export const USER_ROLE_COLORS = {
+  admin: 'cyan',
+  manager: 'magenta',
+  developer: 'geekblue',
+};
+
+export const USER_STATUS_COLORS = {
+  'day off': 'cyan',
+  active: 'green',
+  vacation: 'geekblue',
+  'on sick leave': 'red',
+};
+
+export const WORKDAYS = (() => {
+  const workingWeekdays = [1, 2, 3, 4, 5];
+  let currentDay = dayjs().startOf('month');
+  const monthEnd = dayjs().endOf('month');
+  const businessDays = [];
+  let monthComplete = false;
+
+  while (!monthComplete) {
+    if (workingWeekdays.includes(currentDay.day())) businessDays.push(currentDay.clone());
+
+    currentDay = currentDay.add(1, 'day');
+
+    if (currentDay.isAfter(monthEnd)) monthComplete = true;
+  }
+
+  return businessDays;
+})();
+
+export const HOURS_CAP = WORKDAYS.length * 8;

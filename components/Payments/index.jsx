@@ -25,6 +25,10 @@ const COLUMNS = [
     render: (user) => <Link href='/users/[id]' as={`/users/${user.id}`}><a>{user.name}</a></Link>,
   },
   {
+    title: 'Purpose',
+    dataIndex: 'purpose',
+  },
+  {
     title: 'Account',
     dataIndex: 'account',
     // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid

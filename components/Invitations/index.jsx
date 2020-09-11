@@ -1,11 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Table, Tag, Button } from 'antd';
+import {
+  Table, Tag, Button, Badge,
+} from 'antd';
 
 import styles from './Invitations.module.scss';
 import InviteModal from '../Users/InviteModal/InviteModal';
 import { fetchInvitations } from '../../store/invitations/actions';
 import { invitationsSelector } from '../../store/invitations/selectors';
+import { INVITATION_STATUS_COLORS } from '../../utils/constants';
+import { ucFirst } from '../../utils';
 
 const ROLE_COLORS = {
   admin: 'cyan',
@@ -33,6 +37,12 @@ const COLUMNS = [
     dataIndex: 'invited_by',
     // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
     render: (text) => <a>{text}</a>,
+  },
+  {
+    title: 'Status',
+    dataIndex: 'status',
+    // eslint-disable-next-line react/display-name
+    render: (status) => <Badge status={INVITATION_STATUS_COLORS[status]} text={ucFirst(status)} />,
   },
   {
     title: 'Created At',

@@ -1,5 +1,6 @@
 import { success, error } from '@redux-requests/core';
 import {
+  CLEAN_UP_PAYMENTS,
   FETCH_PAYMENT_STATUSES, FETCH_PAYMENTS,
 } from './types';
 import { reducePaginationResponse } from '../mutations';
@@ -14,11 +15,14 @@ const initialState = {
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
+    case CLEAN_UP_PAYMENTS:
+      return initialState;
+
     case FETCH_PAYMENTS:
       return { ...state, loading: true };
 
     case success(FETCH_PAYMENTS):
-      return reducePaginationResponse(action, state);
+      return reducePaginationResponse(state, action);
 
     case success(FETCH_PAYMENT_STATUSES):
       return { ...state, statuses: action.response.data.data, statusesLoading: false };

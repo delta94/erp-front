@@ -1,6 +1,6 @@
 import { success, error } from '@redux-requests/core';
 import {
-  FETCH_ACCOUNT, LOGIN, LOGOUT,
+  FETCH_ACCOUNT, LOGIN, LOGOUT, REGISTER,
 } from './types';
 
 const initialState = {
@@ -11,12 +11,14 @@ const initialState = {
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case LOGIN:
+    case REGISTER:
     case FETCH_ACCOUNT:
       return { ...state, loading: true };
 
     case success(LOGOUT):
       return { ...initialState };
 
+    case success(REGISTER):
     case success(LOGIN):
       return {
         ...state, user: action.response.data.user, loading: false,
@@ -27,6 +29,7 @@ export const reducer = (state = initialState, action) => {
 
     case error(FETCH_ACCOUNT):
     case error(LOGIN):
+    case error(REGISTER):
       return {
         ...state, loading: false,
       };

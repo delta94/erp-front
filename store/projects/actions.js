@@ -2,6 +2,7 @@ import {
   ADD_PROJECT,
   FETCH_PROJECT_STATUSES,
   FETCH_PROJECTS,
+  CLEAN_UP_PROJECTS,
 } from './types';
 import { composeQuery } from '../../utils';
 
@@ -49,3 +50,7 @@ export const addProject = ({
     },
   };
 };
+
+export const cleanUpProjects = () => ({
+  type: CLEAN_UP_PROJECTS,
+});

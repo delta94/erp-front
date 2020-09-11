@@ -16,7 +16,7 @@ import { fetchAccount } from '../../../../store/auth/actions';
 
 const AuthorizedLayout = ({ title, children }) => {
   const dispatch = useDispatch();
-  const user = useSelector(accountSelector);
+  const [user] = useSelector(accountSelector);
   const [sidebarCollapsed, toggle] = useState(false);
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import {
-  INVITE_USERS, FETCH_INVITATIONS,
+  INVITE_USERS, FETCH_INVITATIONS, FETCH_INVITATION_BY_CODE,
 } from './types';
 
 import { composeQuery } from '../../utils';
@@ -29,3 +29,11 @@ export const inviteUsers = (data) => (
     },
   }
 );
+
+export const fetchInvitationByCode = (code) => ({
+  type: FETCH_INVITATION_BY_CODE,
+  request: {
+    method: 'GET',
+    url: `/invitations/code/${code}`,
+  },
+});

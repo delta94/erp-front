@@ -19,7 +19,7 @@ const ITEMS = [
 
 const AvatarArea = () => {
   const dispatch = useDispatch();
-  const user = useSelector(accountSelector);
+  const [user] = useSelector(accountSelector);
   const router = useRouter();
 
   const logout = useCallback(async () => {

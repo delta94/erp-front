@@ -18,7 +18,7 @@ export const reducer = (state = initialState, action) => {
       return { ...state, loading: true };
 
     case success(FETCH_EXPENSES):
-      return reducePaginationResponse(action, state);
+      return reducePaginationResponse(state, action);
 
     case success(FETCH_EXPENSE_STATUSES):
       return { ...state, statuses: action.response.data.data, statusesLoading: false };

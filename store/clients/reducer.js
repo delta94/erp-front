@@ -14,7 +14,7 @@ const initialState = {
   fieldTypesLoading: false,
   originsLoading: false,
   clientLoading: false,
-  client: null,
+  client: {},
   clientFound: false,
 };
 
@@ -33,7 +33,7 @@ export const reducer = (state = initialState, action) => {
       return { ...state, clientLoading: true };
 
     case success(FETCH_CLIENTS):
-      return reducePaginationResponse(action, state);
+      return reducePaginationResponse(state, action);
 
     case success(FETCH_CLIENT_ORIGINS):
       return { ...state, origins: action.response.data.data, originsLoading: false };

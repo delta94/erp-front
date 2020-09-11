@@ -35,12 +35,13 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "react/display-name": 1,
+    "react/display-name": 0,
+    "jsx-a11y/anchor-is-valid": 0,
     "react/jsx-props-no-spreading": 0,
     "react/forbid-prop-types": 0,
     "quotes": ["error", "single"],
     "jsx-quotes": ["error", "prefer-single"],
     "semi": ["error", "always"],
-    "max-len": ["error", { "code": 120 }]
+    "max-len": ["error", { "code": 120 }],
   }
 }

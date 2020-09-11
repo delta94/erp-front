@@ -1,5 +1,5 @@
 import {
-  ADD_PAYMENT, FETCH_PAYMENT_STATUSES, FETCH_PAYMENTS,
+  ADD_PAYMENT, FETCH_PAYMENT_STATUSES, FETCH_PAYMENTS, CLEAN_UP_PAYMENTS,
 } from './types';
 
 import { composeQuery } from '../../utils';
@@ -34,4 +34,8 @@ export const addPayment = (data) => ({
     url: '/payments',
     data,
   },
+});
+
+export const cleanUpPayments = () => ({
+  type: CLEAN_UP_PAYMENTS,
 });
