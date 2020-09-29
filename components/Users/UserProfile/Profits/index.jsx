@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   Card, Col, Progress, Skeleton,
 } from 'antd';
@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { DollarCircleTwoTone } from '@ant-design/icons';
 
 import styles from './Profits.module.scss';
-import CardTitle from './CardTitle';
+import CardTitle from '../../../common/CardTitle';
 import { userSelector } from '../../../../store/users/selectors';
 import { HOURS_CAP } from '../../../../utils/constants';
 import { formatCurrency } from '../../../../utils';

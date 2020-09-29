@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import moment from 'moment';
 import {
   Badge, Calendar as AntCalendar, Popconfirm, Popover, Button, Typography,
@@ -26,7 +26,7 @@ const TimeList = ({ data }) => {
       <div key={idx.toString()} className={styles.timeList}>
         <span>
           <span className={styles.time}>{ row.time }</span>
-          <Typography.Text ellispis>{ row.project.title }</Typography.Text>
+          <Typography.Text ellispis='true'>{ row.project.title }</Typography.Text>
         </span>
         <Popconfirm
           title='Delete time?'
@@ -61,11 +61,13 @@ const Cell = ({ date, title, onConfirm = () => {} }) => (
 const Calendar = () => {
   const dispatch = useDispatch();
   const { query } = useRouter();
+  const [clickedDate, setClickedDate] = useState(null);
   const [date, setDate] = useState(moment());
   const [calendarData] = useSelector(userMappedCalendarSelector);
   const [modalVisible, toggleModal] = useState(false);
 
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = useCallback((selectedDate) => {
+    setClickedDate(selectedDate);
     toggleModal(true);
   }, []);
 
@@ -113,8 +115,17 @@ const Calendar = () => {
 
   return (
     <>
-      <AddWorktimeModal visible={modalVisible} onCancel={() => toggleModal(false)} onFinish={handleFinish} />
-      <AntCalendar fullscreen={false} dateFullCellRender={renderCell} onChange={handleChange} />
+      <AddWorktimeModal
+        initialValues={{ date: clickedDate }}
+        visible={modalVisible}
+        onCancel={() => toggleModal(false)}
+        onFinish={handleFinish}
+      />
+      <AntCalendar
+        fullscreen={false}
+        dateFullCellRender={renderCell}
+        onChange={handleChange}
+      />
     </>
   );
 };

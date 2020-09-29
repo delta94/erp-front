@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { Badge, Table } from 'antd';
+import {
+  Badge, Table, Result, Empty,
+} from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import styles from './Projects.module.scss';
 import usePagination from '../../../../utils/hooks/usePagination';
 import { RESPONSE_MODE, STATUS_COLORS } from '../../../../utils/constants';
-import { fetchUserProjects } from '../../../../store/users/actions';
+import { clearUserSubState, fetchUserProjects } from '../../../../store/users/actions';
 import { userProjectsSelector } from '../../../../store/users/selectors';
 
 const COLUMNS = [
@@ -41,28 +43,35 @@ const COLUMNS = [
 const UserProjects = () => {
   const dispatch = useDispatch();
   const { query } = useRouter();
-  const [projects, total, loading] = useSelector(userProjectsSelector);
+  const [projects, total, loading, , forbidden] = useSelector(userProjectsSelector);
   const [pagination, paginationOptions] = usePagination();
 
   useEffect(() => {
     if (query.id) dispatch(fetchUserProjects(query.id, { ...pagination, mode: RESPONSE_MODE.SIMPLIFIED }));
+    return () => dispatch(clearUserSubState('projects'));
   }, [dispatch, query, pagination]);
 
   return (
-    <Table
-      size='small'
-      loading={loading}
-      dataSource={projects}
-      columns={COLUMNS}
-      scroll={{ x: 600 }}
-      className={styles.table}
-      showHeader={!!projects.length}
-      pagination={{
-        total,
-        size: 'small',
-        ...paginationOptions,
-      }}
-    />
+    forbidden
+      ? (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='No Access' />
+      )
+      : (
+        <Table
+          size='small'
+          loading={loading}
+          dataSource={projects}
+          columns={COLUMNS}
+          scroll={{ x: 600 }}
+          className={styles.table}
+          showHeader={!!projects.length}
+          pagination={{
+            total,
+            size: 'small',
+            ...paginationOptions,
+          }}
+        />
+      )
   );
 };
 

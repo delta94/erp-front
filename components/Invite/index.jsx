@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -11,7 +11,6 @@ import { fetchInvitationByCode } from '../../store/invitations/actions';
 import { invitationSelector } from '../../store/invitations/selectors';
 import { register } from '../../store/auth/actions';
 import { accountSelector } from '../../store/auth/selectors';
-import { addClient } from '../../store/clients/actions';
 import { parseErrors } from '../../utils';
 
 const Invite = () => {
@@ -39,6 +38,7 @@ const Invite = () => {
   const content = useMemo(() => (
     <Form
       name='register'
+      form={form}
       initialValues={{ name: invitation?.name }}
       onFinish={submit}
     >

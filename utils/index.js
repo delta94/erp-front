@@ -5,7 +5,6 @@ import { CURRENCY_SYMBOLS, EXTENSIONS } from './constants';
  * @typedef {Object} PaginationQuery
  * @property {Number} [page] Current page [1, .., n]
  * @property {Number} [size] Response rows limit [1, .., n]
- * @property {String} [sortBy] Sort by certain field
  * @property {String} [mode] Response mode
  * @property {String} [searchTerm] Search term to filter result
  * @property {Boolean} [descending] Records order
@@ -18,13 +17,18 @@ import { CURRENCY_SYMBOLS, EXTENSIONS } from './constants';
  */
 export function composeQuery(queryObj = { page: 1, size: 10 }) {
   const {
-    page = 1, size = 10, mode, roles, filters = [],
+    page = 1, size = 10, mode, filters = [], sorting = [],
   } = queryObj;
   const query = { skip: (page * size) - size };
   if (size > -1) query.limit = size;
   if (mode) query.mode = mode;
-  if (roles) query.role = roles;
-  if (filters) filters.forEach((filter) => { query[filter.name] = filter.value; });
+  if (filters?.length) filters.forEach((filter) => { query[filter.name] = filter.value; });
+  if (sorting?.length) {
+    sorting.forEach((s) => {
+      const order = s.order === 'ascend' ? '' : '-';
+      query.sort_by = query.sort_by ? [...query.sort_by, `${order}${s.name}`] : [`${order}${s.name}`];
+    });
+  }
   return query;
 }
 
@@ -145,7 +149,11 @@ export function formatCurrency(amount, symbol = CURRENCY_SYMBOLS.usd) {
 }
 
 export function applyFilter(data) {
-  return data ? data.map((item) => ({ text: item, value: item })) : false;
+  return data?.values ? data.values.map((item) => ({ text: item, value: item })) : false;
+}
+
+export function applySorter(data, sorterFn) {
+  return data?.sort ? sorterFn || ((a, b) => a - b) : false;
 }
 
 /**
@@ -155,4 +163,27 @@ export function applyFilter(data) {
  */
 export function mapFilters(filters) {
   return Object.keys(filters).map((item) => ({ name: item, value: filters[item] }));
+}
+
+/**
+ * Map ant design Table sorter object|array
+ *
+ * @param {Object|Array} sorting
+ */
+export function mapSorting(sorting) {
+  const result = [];
+
+  if (sorting.length) {
+    for (let i = 0; i < sorting.length; i += 1) {
+      if (sorting[i].order) result.push({ name: sorting[i].field, order: sorting[i].order });
+    }
+  } else if (sorting.order) {
+    result.push({ name: sorting.field, order: sorting.order });
+  }
+
+  return result;
+}
+
+export function wildcard(permission, id) {
+  return `${permission}.${id}`;
 }

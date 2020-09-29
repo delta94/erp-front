@@ -3,7 +3,7 @@ import { success, error } from '@redux-requests/core';
 import {
   FETCH_CLIENT, FETCH_CLIENT_FIELD_TYPES, FETCH_CLIENT_ORIGINS, FETCH_CLIENTS,
 } from './types';
-import { reducePaginationResponse } from '../mutations';
+import { mapPaginationResponse } from '../mutations';
 
 const initialState = {
   total: 0,
@@ -33,7 +33,7 @@ export const reducer = (state = initialState, action) => {
       return { ...state, clientLoading: true };
 
     case success(FETCH_CLIENTS):
-      return reducePaginationResponse(state, action);
+      return mapPaginationResponse(state, action);
 
     case success(FETCH_CLIENT_ORIGINS):
       return { ...state, origins: action.response.data.data, originsLoading: false };

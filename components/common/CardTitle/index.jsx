@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import styles from './Profits.module.scss';
+import styles from './CardTitle.module.scss';
 
 const CardTitle = ({ title, subTitle, icon }) => (
   <div className={styles.titleWrap}>
@@ -14,8 +14,8 @@ const CardTitle = ({ title, subTitle, icon }) => (
 );
 
 CardTitle.propTypes = {
-  title: PropTypes.string.isRequired,
-  subTitle: PropTypes.string,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  subTitle: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   icon: PropTypes.element,
 };
 

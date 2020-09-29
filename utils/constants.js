@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import moment from 'moment';
 
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -378,10 +378,16 @@ export const INVITATION_STATUS_COLORS = {
   expired: 'error',
 };
 
+export const USER_ROLE = {
+  ADMIN: 'admin',
+  MANAGER: 'manager',
+  DEVELOPER: 'developer',
+};
+
 export const USER_ROLE_COLORS = {
-  admin: 'cyan',
-  manager: 'magenta',
-  developer: 'geekblue',
+  [USER_ROLE.ADMIN]: 'cyan',
+  [USER_ROLE.MANAGER]: 'magenta',
+  [USER_ROLE.DEVELOPER]: 'geekblue',
 };
 
 export const USER_STATUS_COLORS = {
@@ -393,8 +399,8 @@ export const USER_STATUS_COLORS = {
 
 export const WORKDAYS = (() => {
   const workingWeekdays = [1, 2, 3, 4, 5];
-  let currentDay = dayjs().startOf('month');
-  const monthEnd = dayjs().endOf('month');
+  let currentDay = moment().startOf('month');
+  const monthEnd = moment().endOf('month');
   const businessDays = [];
   let monthComplete = false;
 
@@ -410,3 +416,38 @@ export const WORKDAYS = (() => {
 })();
 
 export const HOURS_CAP = WORKDAYS.length * 8;
+
+export const PERMISSION = {
+  ALL: '*',
+  VIEW_USERS: 'users.view',
+  VIEW_DEVELOPERS: 'users[role:developer].view',
+  VIEW_MANAGERS: 'users[role:manager].view',
+  VIEW_ADMINS: 'users[role:admin].view',
+
+  VIEW_PROJECTS: 'projects.view',
+  VIEW_CLIENTS: 'clients.view',
+  VIEW_RAISES: 'raises.view',
+  VIEW_WORKTIME: 'worktime.view',
+  VIEW_ACCOUNTS: 'accounts.view',
+
+  VIEW_USER_PROFITS: 'users[info:profits].view',
+  VIEW_USER_PROJECTS: 'users[info:projects].view',
+  VIEW_USER_WORKTIME: 'users[info:worktime].view',
+  VIEW_USER_ACCOUNTS: 'users[info:accounts].view',
+  VIEW_USER_RAISES_PROJECT: 'users[info:raises[type:project]].view',
+  VIEW_USER_RAISES_PERSONAL: 'users[info:raises[type:personal]].view',
+
+  VIEW_CLIENT_PAYMENTS: 'clients[info:payments].view',
+  VIEW_CLIENT_PROJECTS: 'clients[info:projects].view',
+  VIEW_CLIENT_ABOUT: 'clients[info:about].view',
+  VIEW_CLIENT_LINKS: 'clients[info:links].view',
+
+  ADD_USER_WORKTIME: 'users[info:worktime].create',
+  ADD_USER_RAISES_PERSONAL: 'users[info:raises[type:personal]].create',
+  ADD_USER_RAISES_PROJECT: 'users[info:raises[type:project]].create',
+
+  ADD_INVITATIONS: 'invitations.create',
+  ADD_WORKTIME: 'worktime.create',
+  ADD_RAISES: 'raises.create',
+  ADD_USERS: 'users.create',
+};

@@ -1,6 +1,6 @@
 import {
   FETCH_USER, FETCH_USER_PAYMENTS, FETCH_USER_PROJECTS, FETCH_USER_RAISES, FETCH_USER_ROLES, FETCH_USERS,
-  FETCH_USER_WORKTIME, FETCH_USER_CALENDAR, DELETE_USER_WORKTIME, ADD_USER_WORKTIME,
+  FETCH_USER_WORKTIME, FETCH_USER_CALENDAR, DELETE_USER_WORKTIME, ADD_USER_WORKTIME, CLEAR_USER, CLEAR_USER_SUB_STATE,
 } from './types';
 import { composeQuery } from '../../utils';
 
@@ -138,4 +138,13 @@ export const addUserWorktime = (id, data) => ({
     url: `/users/${id}/worktime`,
     data,
   },
+});
+
+export const clearUser = () => ({
+  type: CLEAR_USER,
+});
+
+export const clearUserSubState = (name) => ({
+  type: CLEAR_USER_SUB_STATE,
+  meta: { subState: name },
 });

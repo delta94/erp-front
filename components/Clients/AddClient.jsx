@@ -1,4 +1,4 @@
-import React, {
+import {
   useCallback, useState, useRef, useMemo, useEffect,
 } from 'react';
 import {
@@ -8,6 +8,8 @@ import { PlusOutlined, MinusCircleOutlined, UploadOutlined } from '@ant-design/i
 import { useDispatch, useSelector } from 'react-redux';
 
 import styles from './Clients.module.scss';
+import usePhotos from '../../utils/hooks/usePhoto';
+import { clientFieldTypesSelector, clientOriginsSelector } from '../../store/clients/selectors';
 import {
   COUNTRIES, CLIENT_FIELD_TYPE, URLS, BASE_URL,
 } from '../../utils/constants';
@@ -17,8 +19,6 @@ import {
 import {
   addClient, fetchClientFieldTypes, fetchClientOrigins,
 } from '../../store/clients/actions';
-import { clientFieldTypesSelector, clientOriginsSelector } from '../../store/clients/selectors';
-import usePhotos from '../../utils/hooks/usePhoto';
 
 const AddClient = () => {
   const dispatch = useDispatch();

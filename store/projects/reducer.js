@@ -1,7 +1,7 @@
 import { success, error } from '@redux-requests/core';
 
 import { FETCH_PROJECTS, FETCH_PROJECT_STATUSES, CLEAN_UP_PROJECTS } from './types';
-import { reducePaginationResponse } from '../mutations';
+import { mapPaginationResponse } from '../mutations';
 
 const initialState = {
   data: [],
@@ -23,7 +23,7 @@ export const reducer = (state = initialState, action) => {
       return { ...state, statusesLoading: true };
 
     case success(FETCH_PROJECTS):
-      return reducePaginationResponse(state, action);
+      return mapPaginationResponse(state, action);
 
     case success(FETCH_PROJECT_STATUSES):
       return { ...state, statuses: action.response.data.data, statusesLoading: false };

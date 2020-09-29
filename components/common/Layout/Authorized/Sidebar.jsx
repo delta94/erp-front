@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 import { Layout as AntLayout, Menu } from 'antd';
@@ -8,10 +8,13 @@ import {
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 
+import { useSelector } from 'react-redux';
 import styles from '../Layout.module.scss';
+import { USER_ROLE } from '../../../../utils/constants';
+import { accountSelector } from '../../../../store/auth/selectors';
 
-const LINKS = [
-  {
+const LINKS = {
+  USERS: {
     title: 'Users',
     icon: TeamOutlined,
     items: [
@@ -19,9 +22,10 @@ const LINKS = [
       { title: 'Invitations', icon: MailOutlined, route: '/invitations' },
     ],
   },
-  { title: 'Projects', icon: DeploymentUnitOutlined, route: '/projects' },
-  { title: 'Clients', icon: SolutionOutlined, route: '/clients' },
-  {
+  USERS_LIST: { title: 'Users', icon: TeamOutlined, route: '/users' },
+  PROJECTS: { title: 'Projects', icon: DeploymentUnitOutlined, route: '/projects' },
+  CLIENTS: { title: 'Clients', icon: SolutionOutlined, route: '/clients' },
+  BUDGET: {
     title: 'Budget',
     icon: BankOutlined,
     items: [
@@ -29,38 +33,45 @@ const LINKS = [
       { title: 'Expenses', route: '/expenses', icon: WalletOutlined },
     ],
   },
-];
+};
+
+const LINKS_MAP = {
+  [USER_ROLE.ADMIN]: [LINKS.USERS, LINKS.PROJECTS, LINKS.CLIENTS, LINKS.BUDGET],
+  [USER_ROLE.MANAGER]: [LINKS.USERS_LIST, LINKS.PROJECTS, LINKS.CLIENTS],
+};
 
 const Sidebar = ({ collapsed }) => {
   const router = useRouter();
+  const [user] = useSelector(accountSelector);
 
   const [openedKey, selectedKey] = useMemo(
     () => {
       let tree = [];
-      const rec = (link, idx) => {
+      const rec = (link) => {
         if (link.items) {
-          tree.push(idx);
+          tree.push(link.title);
           return !!link.items.find(rec);
         }
         const res = link.route === router.route;
-        if (res) tree.push(idx);
+        if (res) tree.push(link.title);
         return res;
       };
-      for (let i = 0; i < LINKS.length; i += 1) {
-        if (rec(LINKS[i], i)) {
+      const arr = LINKS_MAP[user?.role] || [];
+      for (let i = 0; i < arr.length; i += 1) {
+        if (rec(arr[i])) {
           return [tree.slice(0, tree.length - 1).join('-'), tree.join('-')];
         }
         tree = [];
       }
       return [null, null];
     },
-    [router],
+    [router, user],
   );
 
   const renderMenuItems = useCallback((link, idx, tree = []) => {
     const key = tree.length
-      ? `${tree.join('-')}-${idx.toString()}`
-      : idx.toString();
+      ? `${tree.join('-')}-${link.title}`
+      : link.title;
 
     if (link.items) {
       return (
@@ -80,8 +91,10 @@ const Sidebar = ({ collapsed }) => {
     );
   }, []);
 
-  const links = useMemo(() => LINKS.map((item, idx) => renderMenuItems(item, idx)),
-    [renderMenuItems]);
+  const links = useMemo(() => {
+    const array = LINKS_MAP[user?.role] || [];
+    return array.map((item, idx) => renderMenuItems(item, idx));
+  }, [renderMenuItems, user]);
 
   return (
     <AntLayout.Sider trigger={null} collapsible collapsed={collapsed}>
@@ -91,6 +104,7 @@ const Sidebar = ({ collapsed }) => {
         mode='inline'
         defaultSelectedKeys={[selectedKey]}
         defaultOpenKeys={[openedKey]}
+        selectedKeys={[selectedKey]}
       >
         { links }
       </Menu>

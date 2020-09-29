@@ -1,7 +1,7 @@
 import { error, success } from '@redux-requests/core';
 
 import { FETCH_INVITATIONS, FETCH_INVITATION_BY_CODE } from './types';
-import { reducePaginationResponse } from '../mutations';
+import { mapPaginationResponse } from '../mutations';
 
 const initialState = {
   data: [],
@@ -21,7 +21,7 @@ export const reducer = (state = initialState, action) => {
       return { ...state, invitationLoading: true, invitationFound: false };
 
     case success(FETCH_INVITATIONS):
-      return reducePaginationResponse(state, action);
+      return mapPaginationResponse(state, action);
 
     case success(FETCH_INVITATION_BY_CODE):
       return {

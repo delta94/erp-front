@@ -3,7 +3,7 @@ import {
   CLEAN_UP_PAYMENTS,
   FETCH_PAYMENT_STATUSES, FETCH_PAYMENTS,
 } from './types';
-import { reducePaginationResponse } from '../mutations';
+import { mapPaginationResponse } from '../mutations';
 
 const initialState = {
   data: [],
@@ -22,7 +22,7 @@ export const reducer = (state = initialState, action) => {
       return { ...state, loading: true };
 
     case success(FETCH_PAYMENTS):
-      return reducePaginationResponse(state, action);
+      return mapPaginationResponse(state, action);
 
     case success(FETCH_PAYMENT_STATUSES):
       return { ...state, statuses: action.response.data.data, statusesLoading: false };

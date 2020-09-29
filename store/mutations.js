@@ -1,4 +1,4 @@
-export function reducePaginationResponse(state, action) {
+export function mapPaginationResponse(state, action) {
   const newState = {
     ...state,
     data: action.response.data.data.map((item) => {
@@ -10,7 +10,11 @@ export function reducePaginationResponse(state, action) {
     loading: false,
   };
 
-  if (state.filters && !Object.keys(state.filters).length) {
+  if (
+    state.filters
+    && !Object.keys(state.filters).length
+    && JSON.stringify(state.filters) !== JSON.stringify(action.response.data.filters)
+  ) {
     newState.filters = action.response.data.filters || { set: true };
   }
 
@@ -45,4 +49,23 @@ export function mutateSubState(state, action, stateOrMutation) {
     return { ...state, [moduleName]: { ...state[moduleName], ...stateOrMutation } };
   }
   return { ...state };
+}
+
+/**
+ * @param {Object} state
+ * @param {Object} action
+ */
+export function mapError(state, action) {
+  const newState = {
+    ...state,
+    loading: false,
+  };
+
+  switch (action.error?.response?.status) {
+    case 404: newState.found = false; break;
+    case 403: newState.forbidden = true; break;
+    default: break;
+  }
+
+  return newState;
 }

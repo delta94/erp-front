@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Table, Button, Badge,
@@ -6,46 +6,68 @@ import {
 import Link from 'next/link';
 
 import styles from './Projects.module.scss';
+import usePagination from '../../utils/hooks/usePagination';
+import GuardedLink from '../common/GuardedLink';
 import { projectsSelector } from '../../store/projects/selectors';
 import { fetchProjects } from '../../store/projects/actions';
-import { STATUS_COLORS } from '../../utils/constants';
-import usePagination from '../../utils/hooks/usePagination';
+import { PERMISSION, STATUS_COLORS } from '../../utils/constants';
+import { wildcard } from '../../utils';
 
 const COLUMNS = [
   {
     title: 'Title',
     dataIndex: 'title',
     // eslint-disable-next-line jsx-a11y/anchor-is-valid,react/display-name
-    render: (text, { id }) => <Link href='/projects/[id]' as={`/projects/${id}`}><a>{text}</a></Link>,
+    render: (text, { id }) => <Link href={`/projects/${id}`}><a>{text}</a></Link>,
   },
   {
     title: 'Developers',
     dataIndex: 'developers',
-    render: (data) => data.map((item, idx) => (
-      <Link key={idx.toString()} href='/users/[id]' as={`/users/${item.id}`}>
-        { /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
-        <a>{item.name}</a>
-      </Link>
-    )),
+    render: (data) => (
+      <ul className={styles.list}>
+        {
+          data.map((item, idx) => (
+            <li key={idx.toString()}>
+              <GuardedLink
+                gates={[PERMISSION.VIEW_USERS, PERMISSION.VIEW_DEVELOPERS, wildcard(PERMISSION.VIEW_USERS, item.id)]}
+                href={`/users/${item.id}`}
+                label={item.name}
+              />
+            </li>
+          ))
+        }
+      </ul>
+    ),
   },
   {
     title: 'Managers',
     dataIndex: 'managers',
-    render: (data) => data.map((item, idx) => (
-      <Link key={idx.toString()} href='/users/[id]' as={`/users/${item.id}`}>
-        { /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
-        <a>{item.name}</a>
-      </Link>
-    )),
+    render: (data) => (
+      <ul className={styles.list}>
+        {
+          data.map((item, idx) => (
+            <li key={idx.toString()}>
+              <GuardedLink
+                gates={[PERMISSION.VIEW_USERS, PERMISSION.VIEW_MANAGERS, wildcard(PERMISSION.VIEW_USERS, item.id)]}
+                href={`/users/${item.id}`}
+                label={item.name}
+              />
+            </li>
+          ))
+        }
+      </ul>
+    ),
   },
   {
     title: 'Clients',
     dataIndex: 'clients',
     render: (data) => data.map((item, idx) => (
-      <Link key={idx.toString()} href='/clients/[id]' as={`/clients/${item.id}`}>
-        { /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
-        <a>{item.name}</a>
-      </Link>
+      <GuardedLink
+        key={idx.toString()}
+        gates={[PERMISSION.VIEW_CLIENTS, wildcard(PERMISSION.VIEW_CLIENTS, item.id)]}
+        href={`/clients/${item.id}`}
+        label={item.name}
+      />
     )),
   },
   {
@@ -57,10 +79,6 @@ const COLUMNS = [
   {
     title: 'Created At',
     dataIndex: 'created_at',
-  },
-  {
-    title: 'Starting At',
-    dataIndex: 'start_date',
   },
 ];
 

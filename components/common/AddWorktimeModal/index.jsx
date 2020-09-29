@@ -1,4 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import {
+  useState, useCallback, useEffect, useMemo,
+} from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {
@@ -13,7 +15,9 @@ import { mapOptions, parseErrors } from '../../../utils';
 import { addUserWorktime, fetchUserProjects } from '../../../store/users/actions';
 import { RESPONSE_MODE } from '../../../utils/constants';
 
-const AddWorktimeModal = ({ visible, onCancel, onFinish }) => {
+const AddWorktimeModal = ({
+  visible, onCancel, onFinish, initialValues,
+}) => {
   const dispatch = useDispatch();
   const { query } = useRouter();
   const [form] = Form.useForm();
@@ -39,9 +43,9 @@ const AddWorktimeModal = ({ visible, onCancel, onFinish }) => {
       } else if (error) {
         message.error(error.message);
       } else {
-        onFinish();
         message.success(data.message);
         form.resetFields();
+        onFinish();
       }
     } catch (e) {
       // validation failed
@@ -117,6 +121,11 @@ const AddWorktimeModal = ({ visible, onCancel, onFinish }) => {
     if (query.id && visible) fetchProjectOptions().catch(() => {});
   }, [query, visible, fetchProjectOptions]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (visible) form.resetFields();
+  }, [form, visible]);
+
   return (
     <Modal
       title='Add worktime'
@@ -137,9 +146,7 @@ const AddWorktimeModal = ({ visible, onCancel, onFinish }) => {
         name='invite'
         form={form}
         initialValues={{
-          worktime: [{
-            date: '', time: '', project_id: '',
-          }],
+          worktime: [initialValues],
         }}
       >
         <Form.List name='worktime'>
@@ -168,11 +175,13 @@ AddWorktimeModal.propTypes = {
   visible: PropTypes.bool.isRequired,
   onCancel: PropTypes.func,
   onFinish: PropTypes.func,
+  initialValues: PropTypes.object,
 };
 
 AddWorktimeModal.defaultProps = {
   onCancel: () => {},
   onFinish: () => {},
+  initialValues: { date: '', time: '', project_id: '' },
 };
 
 export default AddWorktimeModal;

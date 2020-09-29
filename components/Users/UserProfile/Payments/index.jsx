@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { Badge, Table, Tag } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import styles from './Projects.module.scss';
 import usePagination from '../../../../utils/hooks/usePagination';
 import { ORIGIN_COLORS, PAYMENT_STATUS_COLORS, RESPONSE_MODE } from '../../../../utils/constants';
-import { fetchUserPayments } from '../../../../store/users/actions';
+import { clearUserSubState, fetchUserPayments } from '../../../../store/users/actions';
 import { userPaymentsSelector } from '../../../../store/users/selectors';
 import { formatCurrency } from '../../../../utils';
 
@@ -50,6 +50,7 @@ const UserPayments = () => {
 
   useEffect(() => {
     if (query.id) dispatch(fetchUserPayments(query.id, { ...pagination, mode: RESPONSE_MODE.SIMPLIFIED }));
+    return () => dispatch(clearUserSubState('payments'));
   }, [dispatch, query, pagination]);
 
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, Button, Tag } from 'antd';
 import Link from 'next/link';
@@ -6,7 +6,7 @@ import Link from 'next/link';
 import styles from './Clients.module.scss';
 import { clientsSelector } from '../../store/clients/selectors';
 import { fetchClients } from '../../store/clients/actions';
-import { ORIGIN_COLORS } from '../../utils/constants';
+import { ORIGIN_COLORS, RESPONSE_MODE } from '../../utils/constants';
 
 const COLUMNS = [
   {
@@ -44,7 +44,7 @@ const Clients = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(fetchClients(pagination));
+    dispatch(fetchClients({ ...pagination, mode: RESPONSE_MODE.SIMPLIFIED }));
   }, [dispatch, pagination]);
 
   return (

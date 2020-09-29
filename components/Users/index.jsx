@@ -1,6 +1,4 @@
-import React, {
-  useEffect, useState, useCallback, useMemo,
-} from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, Tag, Button } from 'antd';
 import Link from 'next/link';
@@ -8,57 +6,53 @@ import Link from 'next/link';
 import styles from './Users.module.scss';
 import InviteModal from './InviteModal/InviteModal';
 import usePagination from '../../utils/hooks/usePagination';
+import useFilters from '../../utils/hooks/useFilters';
 import { fetchUsers } from '../../store/users/actions';
 import { usersSelector } from '../../store/users/selectors';
 import { RESPONSE_MODE, USER_ROLE_COLORS, USER_STATUS_COLORS } from '../../utils/constants';
-import { applyFilter, mapFilters } from '../../utils';
+
+const COLUMNS = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    render: (text, { id }) => <Link href='/users/[id]' as={`/users/${id}`}><a>{text}</a></Link>,
+  },
+  {
+    title: 'Email',
+    dataIndex: 'email',
+  },
+  {
+    title: 'Role',
+    dataIndex: 'role',
+    render: (text) => <Tag color={USER_ROLE_COLORS[text] || 'default'}>{text}</Tag>,
+  },
+  {
+    title: 'Status',
+    dataIndex: 'status',
+    render: (text) => <Tag color={USER_STATUS_COLORS[text] || 'default'}>{text}</Tag>,
+  },
+  {
+    title: 'Created At',
+    dataIndex: 'created_at',
+  },
+];
 
 const Users = () => {
   const dispatch = useDispatch();
   const [inviteModalVisible, setInviteModalVisibility] = useState(false);
   const [users, total, loading, filtersData] = useSelector(usersSelector);
   const [pagination, paginationOptions] = usePagination();
-  const [filters, setFilters] = useState([]);
+  const [filters, sorting, filterOptions] = useFilters(COLUMNS, filtersData);
 
   const openInviteModal = useCallback(() => setInviteModalVisibility(true), []);
 
   const closeInviteModal = useCallback(() => setInviteModalVisibility(false), []);
 
-  const columns = useMemo(() => [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      render: (text, { id }) => <Link href='/users/[id]' as={`/users/${id}`}><a>{text}</a></Link>,
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-    },
-    {
-      title: 'Role',
-      dataIndex: 'role',
-      render: (text) => <Tag color={USER_ROLE_COLORS[text] || 'default'}>{text}</Tag>,
-      filters: applyFilter(filtersData.role),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      render: (text) => <Tag color={USER_STATUS_COLORS[text] || 'default'}>{text}</Tag>,
-      filters: applyFilter(filtersData.status),
-    },
-    {
-      title: 'Created At',
-      dataIndex: 'created_at',
-    },
-  ], [filtersData]);
-
-  const onChange = useCallback((p, f, sorter, source) => {
-    if (source.action === 'filter') setFilters(mapFilters(f));
-  }, []);
-
   useEffect(() => {
-    dispatch(fetchUsers({ ...pagination, filters, mode: RESPONSE_MODE.SIMPLIFIED }));
-  }, [dispatch, pagination, filters]);
+    dispatch(fetchUsers({
+      ...pagination, filters, sorting, mode: RESPONSE_MODE.SIMPLIFIED,
+    }));
+  }, [dispatch, pagination, filters, sorting]);
 
   return (
     <>
@@ -73,12 +67,11 @@ const Users = () => {
       <Table
         loading={loading}
         dataSource={users}
-        columns={columns}
-        onChange={onChange}
         pagination={{
           total,
           ...paginationOptions,
         }}
+        {...filterOptions}
       />
       <InviteModal
         visible={inviteModalVisible}

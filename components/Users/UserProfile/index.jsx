@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import {
   PageHeader, Row, Col, Card, Avatar, Typography, Tag, Skeleton, Result, Button, Tabs, Tooltip,
 } from 'antd';
@@ -10,16 +10,21 @@ import {
 } from '@ant-design/icons';
 
 import styles from './UserProfile.module.scss';
+import Can from '../../common/Can';
 import Profits from './Profits';
+import Time from './Time';
 import UserRaises from './Raises';
 import UserProjects from './Projects';
 import UserPayments from './Payments';
 import UserCalendar from './Calendar';
 import UserWorktime from './Worktime';
-import { fetchUser } from '../../../store/users/actions';
-import { userCalendarSelector, userSelector } from '../../../store/users/selectors';
-import { USER_ROLE_COLORS, USER_STATUS_COLORS } from '../../../utils/constants';
-import { formatCurrency } from '../../../utils';
+import { fetchUser, clearUser } from '../../../store/users/actions';
+import { userSelector } from '../../../store/users/selectors';
+import { formatCurrency, wildcard } from '../../../utils';
+import { accountSelector } from '../../../store/auth/selectors';
+import {
+  USER_ROLE, USER_ROLE_COLORS, USER_STATUS_COLORS, PERMISSION,
+} from '../../../utils/constants';
 
 const CARD_STYLE = {
   headStyle: {
@@ -33,36 +38,52 @@ const CARD_STYLE = {
   },
 };
 
-const TABS = [
-  {
+const TABS = {
+  PROJECTS: {
     title: 'Projects',
     icon: ProjectOutlined,
     component: UserProjects,
   },
-  {
+  PAYMENTS: {
     title: 'Payments',
     icon: DollarOutlined,
     component: UserPayments,
   },
-  {
+  RAISES: {
     title: 'Raises',
     icon: ToTopOutlined,
     component: UserRaises,
   },
-  {
+  WORKTIME: {
     title: 'Worktime',
     icon: ClockCircleOutlined,
     component: UserWorktime,
   },
-];
+};
+
+const MAP = {
+  [USER_ROLE.ADMIN]: Object.values(TABS),
+  [USER_ROLE.MANAGER]: [TABS.PROJECTS, TABS.RAISES, TABS.WORKTIME],
+};
+
+const Loader = ({ spanSize = 12 }) => (
+  <Col span={spanSize}>
+    <Card className={styles.block} {...CARD_STYLE}>
+      <Skeleton loading active className={styles.fullWidth} />
+    </Card>
+  </Col>
+);
 
 const UserProfile = () => {
   const dispatch = useDispatch();
   const { back, query } = useRouter();
+  const [account] = useSelector(accountSelector);
   const [user, loading, isFound] = useSelector(userSelector);
 
   useEffect(() => {
     if (query.id) dispatch(fetchUser(query.id));
+
+    return () => dispatch(clearUser());
   }, [dispatch, query]);
 
   const renderTab = useCallback((tab, idx) => (
@@ -78,6 +99,8 @@ const UserProfile = () => {
       <tab.component />
     </Tabs.TabPane>
   ), []);
+
+  const tabs = useMemo(() => (MAP[account?.role] || []).map(renderTab), [account, renderTab]);
 
   const content = useMemo(() => (
     <Row gutter={[16, 16]}>
@@ -110,10 +133,15 @@ const UserProfile = () => {
               {...CARD_STYLE}
             >
               <Skeleton loading={loading} active>
-                <Typography.Text className={styles.description} copyable>
-                  <Tooltip title='Rate'><DollarOutlined /></Tooltip>
-                  { formatCurrency(user.rate) }
-                </Typography.Text>
+                <Can
+                  perform='rate:view'
+                  yes={(
+                    <Typography.Text className={styles.description} copyable>
+                      <Tooltip title='Rate'><DollarOutlined /></Tooltip>
+                      { formatCurrency(user.rate) }
+                    </Typography.Text>
+                  )}
+                />
                 <Typography.Link href={`mailto:${user.email}`} className={styles.description} copyable>
                   <Tooltip title='Email'><MailOutlined /></Tooltip>
                   { user.email }
@@ -122,25 +150,40 @@ const UserProfile = () => {
             </Card>
           </Col>
           <Col span={24}>
-            <Card
-              className={styles.block}
-              {...CARD_STYLE}
-            >
-              <Skeleton loading={loading} active>
-                <UserCalendar />
-              </Skeleton>
-            </Card>
+            <Can
+              perform={wildcard(PERMISSION.VIEW_USER_WORKTIME, user.id)}
+              yes={(
+                <Card
+                  className={styles.block}
+                  {...CARD_STYLE}
+                >
+                  <Skeleton loading={loading} active>
+                    <UserCalendar />
+                  </Skeleton>
+                </Card>
+              )}
+              loading={<Loader spanSize={24} />}
+            />
           </Col>
         </Row>
       </Col>
       <Col span={16}>
         <Row gutter={[16, 16]}>
-          <Profits />
+          <Can
+            perform={wildcard(PERMISSION.VIEW_USER_PROFITS, user.id)}
+            yes={<Profits />}
+            loading={<Loader />}
+          />
+          <Can
+            perform={wildcard(PERMISSION.VIEW_USER_WORKTIME, user.id)}
+            yes={<Time />}
+            loading={<Loader />}
+          />
           <Col span={24}>
             <Card className={styles.block} {...CARD_STYLE}>
               <Skeleton loading={loading} active>
                 <Tabs>
-                  {TABS.map(renderTab)}
+                  {tabs}
                 </Tabs>
               </Skeleton>
             </Card>
@@ -148,7 +191,7 @@ const UserProfile = () => {
         </Row>
       </Col>
     </Row>
-  ), [user, renderTab, loading]);
+  ), [user, tabs, loading]);
 
   return (
     <>
@@ -158,7 +201,7 @@ const UserProfile = () => {
         subTitle={user.name}
         onBack={back}
         extra={[
-          <Button key={0} type='primary'>Edit</Button>,
+          <Can key={0} perform='users:edit' yes={<Button key={0} type='primary'>Edit</Button>} />,
         ]}
       />
       {

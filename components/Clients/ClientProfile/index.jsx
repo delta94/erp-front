@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import {
   PageHeader, Row, Col, Card, Avatar, Typography, Tag, Skeleton, Result, Empty, Button, Tabs,
 } from 'antd';
@@ -10,9 +10,12 @@ import {
 
 import styles from '../Clients.module.scss';
 import SimplifiedProjectsList from '../../common/SimplifiedProjectsList';
+import Can from '../../common/Can';
+import About from './About';
 import { fetchClient } from '../../../store/clients/actions';
 import { clientSelector } from '../../../store/clients/selectors';
-import { ORIGIN_COLORS } from '../../../utils/constants';
+import { ORIGIN_COLORS, PERMISSION } from '../../../utils/constants';
+import { wildcard } from '../../../utils';
 
 const CARD_STYLE = {
   headStyle: {
@@ -39,6 +42,15 @@ const TABS = [
     component: () => 'tab 2',
   },
 ];
+
+// eslint-disable-next-line react/prop-types
+const Loader = ({ spanSize = 12 }) => (
+  <Col span={spanSize}>
+    <Card className={styles.block} {...CARD_STYLE}>
+      <Skeleton loading active className={styles.fullWidth} />
+    </Card>
+  </Col>
+);
 
 const ClientProfile = () => {
   const dispatch = useDispatch();
@@ -86,42 +98,11 @@ const ClientProfile = () => {
               </Skeleton>
             </Card>
           </Col>
-          <Col span={24}>
-            <Card
-              className={styles.block}
-              title='About'
-              {...CARD_STYLE}
-            >
-              <Skeleton loading={loading} active>
-                <Typography.Text className={styles.description} copyable>
-                  <HomeOutlined />
-                  { client.full_address }
-                </Typography.Text>
-                <Typography.Link href={`mailto:${client.email}`} className={styles.description} copyable>
-                  <MailOutlined />
-                  { client.email }
-                </Typography.Link>
-                { client.phone && (
-                  <Typography.Link href={`tel:${client.phone}`} className={styles.description} copyable>
-                    <PhoneOutlined />
-                    { client.phone }
-                  </Typography.Link>
-                ) }
-                { client.websites?.length ? client.websites.map((website, idx) => (
-                  <Typography.Link
-                    key={idx.toString()}
-                    href={`https://${website}`}
-                    className={styles.description}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    <LinkOutlined />
-                    { website }
-                  </Typography.Link>
-                )) : null}
-              </Skeleton>
-            </Card>
-          </Col>
+          <Can
+            perform={wildcard(PERMISSION.VIEW_CLIENT_ABOUT)}
+            yes={<About />}
+            loading={<Loader />}
+          />
           <Col span={24}>
             <Card
               className={styles.block}

@@ -19,7 +19,7 @@ import { BASE_URL } from '../utils/constants';
 
 const loggerMiddleware = createLogger();
 
-const instance = axios.create({
+export const instance = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
   headers: {

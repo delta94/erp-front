@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { Badge, Button, Table } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
