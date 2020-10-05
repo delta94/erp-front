@@ -1,7 +1,17 @@
 import { createSelector } from 'reselect';
 
-export const usersSelector = (state) => [state.users.data, state.users.total, state.users.loading, state.users.filters];
-export const userSelector = (state) => [state.users.user, state.users.userLoading, state.users.userFound];
+export const usersSelector = (state) => [
+  state.users.data,
+  state.users.total,
+  state.users.loading,
+  state.users.filters,
+];
+
+export const userSelector = (state) => [
+  state.users.user,
+  state.users.userLoading,
+  state.users.userFound,
+];
 
 export const userRolesSelector = (state) => [
   state.users.roles.data,

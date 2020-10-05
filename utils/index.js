@@ -17,11 +17,13 @@ import { CURRENCY_SYMBOLS, EXTENSIONS } from './constants';
  */
 export function composeQuery(queryObj = { page: 1, size: 10 }) {
   const {
-    page = 1, size = 10, mode, filters = [], sorting = [],
+    page = 1, size = 10, mode, filters = [], sorting = [], pagination,
   } = queryObj;
   const query = { skip: (page * size) - size };
   if (size > -1) query.limit = size;
   if (mode) query.mode = mode;
+  if (pagination) query.pagination = pagination;
+  if (queryObj.with) query.with = queryObj.with;
   if (filters?.length) filters.forEach((filter) => { query[filter.name] = filter.value; });
   if (sorting?.length) {
     sorting.forEach((s) => {
@@ -186,4 +188,26 @@ export function mapSorting(sorting) {
 
 export function wildcard(permission, id) {
   return `${permission}.${id}`;
+}
+
+export function downloadBlob(blob, fileName) {
+  const file = new File([blob], fileName);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(file);
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+  }, 0);
+}
+
+/**
+ * Content-Disposition header only
+ *
+ * @param {String} header
+ */
+export function getFileName(header) {
+  const [, group] = /attachment; filename="(.*)"/gm.exec(header);
+  return group;
 }

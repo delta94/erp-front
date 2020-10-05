@@ -30,7 +30,8 @@ const COLUMNS = [
             <li key={idx.toString()}>
               <GuardedLink
                 gates={[PERMISSION.VIEW_USERS, PERMISSION.VIEW_DEVELOPERS, wildcard(PERMISSION.VIEW_USERS, item.id)]}
-                href={`/users/${item.id}`}
+                href='/users/id'
+                as={`/users/${item.id}`}
                 label={item.name}
               />
             </li>
@@ -49,7 +50,8 @@ const COLUMNS = [
             <li key={idx.toString()}>
               <GuardedLink
                 gates={[PERMISSION.VIEW_USERS, PERMISSION.VIEW_MANAGERS, wildcard(PERMISSION.VIEW_USERS, item.id)]}
-                href={`/users/${item.id}`}
+                href='/users/[id]'
+                as={`/users/${item.id}`}
                 label={item.name}
               />
             </li>
@@ -59,16 +61,16 @@ const COLUMNS = [
     ),
   },
   {
-    title: 'Clients',
-    dataIndex: 'clients',
-    render: (data) => data.map((item, idx) => (
+    title: 'Client',
+    dataIndex: 'client',
+    render: (item) => (
       <GuardedLink
-        key={idx.toString()}
         gates={[PERMISSION.VIEW_CLIENTS, wildcard(PERMISSION.VIEW_CLIENTS, item.id)]}
-        href={`/clients/${item.id}`}
+        href='/clients/[id]'
+        as={`/clients/${item.id}`}
         label={item.name}
       />
-    )),
+    ),
   },
   {
     title: 'Status',

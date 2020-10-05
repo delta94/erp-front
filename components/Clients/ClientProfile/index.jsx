@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useCallback } from 'react';
-import {
-  PageHeader, Row, Col, Card, Avatar, Typography, Tag, Skeleton, Result, Empty, Button, Tabs,
-} from 'antd';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  HomeOutlined, MailOutlined, PhoneOutlined, ShareAltOutlined, LinkOutlined, ProjectOutlined, ScheduleOutlined,
+  PageHeader, Row, Col, Card, Avatar, Typography, Tag, Skeleton, Result, Empty, Button, Tabs,
+} from 'antd';
+import {
+  ShareAltOutlined, ProjectOutlined, ScheduleOutlined,
 } from '@ant-design/icons';
 
 import styles from '../Clients.module.scss';

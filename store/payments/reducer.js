@@ -1,21 +1,38 @@
 import { success, error } from '@redux-requests/core';
 import {
-  CLEAN_UP_PAYMENTS,
-  FETCH_PAYMENT_STATUSES, FETCH_PAYMENTS,
+  CLEAR_PAYMENTS,
+  FETCH_PAYMENT_STATUSES,
+  FETCH_PAYMENTS,
 } from './types';
-import { mapPaginationResponse } from '../mutations';
+import { mapPaginationResponse, mutateSubState } from '../mutations';
+
+const subState = {
+  data: [],
+  filters: {},
+  total: 0,
+  loading: false,
+  forbidden: false,
+};
+
+const singleEntity = {
+  user: {},
+  userLoading: true,
+  found: false,
+  forbidden: false,
+};
 
 const initialState = {
   data: [],
-  statuses: [],
   total: 0,
   loading: false,
-  statusesLoading: false,
+
+  ...{ singleEntity },
+  statuses: { ...subState },
 };
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case CLEAN_UP_PAYMENTS:
+    case CLEAR_PAYMENTS:
       return initialState;
 
     case FETCH_PAYMENTS:
@@ -25,7 +42,7 @@ export const reducer = (state = initialState, action) => {
       return mapPaginationResponse(state, action);
 
     case success(FETCH_PAYMENT_STATUSES):
-      return { ...state, statuses: action.response.data.data, statusesLoading: false };
+      return mutateSubState(state, action, mapPaginationResponse);
 
     case error(FETCH_PAYMENTS):
       return {

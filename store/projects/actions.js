@@ -2,7 +2,7 @@ import {
   ADD_PROJECT,
   FETCH_PROJECT_STATUSES,
   FETCH_PROJECTS,
-  CLEAN_UP_PROJECTS,
+  FETCH_PROJECT_ACCOUNTS, FETCH_PROJECT_WORKTIME, CLEAR_PROJECTS,
 } from './types';
 import { composeQuery } from '../../utils';
 
@@ -51,6 +51,32 @@ export const addProject = ({
   };
 };
 
-export const cleanUpProjects = () => ({
-  type: CLEAN_UP_PROJECTS,
+export const fetchProjectAccounts = (id, query) => {
+  const params = composeQuery(query);
+  return ({
+    type: FETCH_PROJECT_ACCOUNTS,
+    request: {
+      method: 'GET',
+      url: `/projects/${id}/accounts`,
+      params,
+    },
+    meta: { subState: 'accounts' },
+  });
+};
+
+export const fetchProjectWorktime = (id, query, meta = {}) => {
+  const params = composeQuery(query);
+  return ({
+    type: FETCH_PROJECT_WORKTIME,
+    request: {
+      method: 'GET',
+      url: `/projects/${id}/worktime`,
+      params,
+    },
+    meta: { subState: 'worktime', ...meta },
+  });
+};
+
+export const clearProjects = () => ({
+  type: CLEAR_PROJECTS,
 });

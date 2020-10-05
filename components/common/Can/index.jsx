@@ -18,6 +18,7 @@ const Can = ({
 
   const check = useCallback((permission) => {
     if (user) {
+      if (user.permissions.includes('*')) return true;
       if (permission === '*') return true;
       const ids = retrieveIdsFromPermission(permission);
       if (ids) {
