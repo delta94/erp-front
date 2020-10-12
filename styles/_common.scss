@@ -1,3 +1,12 @@
+.container {
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.rounded {
+  border-radius: 4px;
+}
+
 .pageHeader {
   background-color: #fff;
   margin-bottom: 20px;
@@ -10,4 +19,20 @@
 
 .selectBadge {
   margin-left: 4px;
+}
+
+.badge {
+  margin-left: 4px;
+}
+
+.removeWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.remove {
+  padding-right: 0;
+  padding-left: 0;
+  float: right;
 }

@@ -23,8 +23,10 @@ const COLUMNS = [
   },
   {
     title: 'Role',
-    dataIndex: 'role',
-    render: (text) => <Tag color={USER_ROLE_COLORS[text] || 'default'}>{text}</Tag>,
+    dataIndex: 'roles',
+    render: (roles) => roles.map(
+      (role, idx) => (<Tag key={idx.toString()} color={USER_ROLE_COLORS[role] || 'default'}>{role}</Tag>),
+    ),
   },
   {
     title: 'Status',

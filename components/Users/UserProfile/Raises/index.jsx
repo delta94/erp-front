@@ -11,7 +11,7 @@ import { RESPONSE_MODE, STATUS_COLORS, USER_ROLE } from '../../../../utils/const
 import { clearUserSubState, fetchUserRaises } from '../../../../store/users/actions';
 import { userRaisesSelector } from '../../../../store/users/selectors';
 import { formatCurrency } from '../../../../utils';
-import { accountSelector } from '../../../../store/auth/selectors';
+import { signedUserSelector } from '../../../../store/auth/selectors';
 
 const COLUMNS = {
   TYPE: {
@@ -51,7 +51,7 @@ const UserRaises = () => {
   const { query } = useRouter();
   const [projects, total, loading, , forbidden] = useSelector(userRaisesSelector);
   const [pagination, paginationOptions] = usePagination();
-  const [user] = useSelector(accountSelector);
+  const [user] = useSelector(signedUserSelector);
 
   const columns = useMemo(() => MAP[user?.role], [user]);
 

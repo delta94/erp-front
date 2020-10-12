@@ -2,7 +2,7 @@ import { useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 
-import { accountSelector } from '../../../store/auth/selectors';
+import { signedUserSelector } from '../../../store/auth/selectors';
 
 function retrieveIdsFromPermission(permission) {
   const [, , ids] = permission.split('.');
@@ -12,12 +12,13 @@ function retrieveIdsFromPermission(permission) {
 }
 
 const Can = ({
-  perform, yes, no, loading, checkType,
+  perform, yes, no, loading,
 }) => {
-  const [user] = useSelector(accountSelector);
+  const [user] = useSelector(signedUserSelector);
 
-  const check = useCallback((permission) => {
+  const check = useCallback((permission, type) => {
     if (user) {
+      if (type === 'except') return user.permissions.includes(permission);
       if (user.permissions.includes('*')) return true;
       if (permission === '*') return true;
       const ids = retrieveIdsFromPermission(permission);
@@ -48,12 +49,19 @@ const Can = ({
 
   const canPerform = useMemo(() => {
     if (typeof perform === 'object') {
-      const checks = perform.map(check);
-      const results = checks.filter((item) => item);
-      return (checkType === 'all' && results.length === checks.length) || (checkType === 'any' && results.length > 0);
+      return Object.keys(perform).reduce((all, key) => {
+        const checks = perform[key].map((i) => check(i, key));
+        const results = checks.filter((item) => item);
+        switch (key) {
+          case 'all': return all && results.length === checks.length;
+          case 'any': return all && results.length > 0;
+          case 'except': return all && results.length === 0;
+          default: return all;
+        }
+      }, true);
     }
     return check(perform);
-  }, [perform, check, checkType]);
+  }, [perform, check]);
 
   if (!user) return loading || null;
 
@@ -61,11 +69,14 @@ const Can = ({
 };
 
 Can.propTypes = {
-  perform: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.string]).isRequired,
+  perform: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({
+    all: PropTypes.arrayOf(PropTypes.string),
+    any: PropTypes.arrayOf(PropTypes.string),
+    except: PropTypes.arrayOf(PropTypes.string),
+  })]).isRequired,
   yes: PropTypes.oneOfType([PropTypes.element, PropTypes.oneOf([null])]).isRequired,
   no: PropTypes.oneOfType([PropTypes.element, PropTypes.oneOf([null]), PropTypes.string]),
   loading: PropTypes.element,
-  checkType: PropTypes.oneOf(['any', 'all']),
 };
 
 Can.defaultProps = {

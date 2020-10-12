@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import styles from '../Layout.module.scss';
-import { accountSelector } from '../../../../store/auth/selectors';
+import { signedUserSelector } from '../../../../store/auth/selectors';
 import { logout as logoutAction } from '../../../../store/auth/actions';
 
 const ITEMS = [
@@ -19,7 +19,7 @@ const ITEMS = [
 
 const AvatarArea = () => {
   const dispatch = useDispatch();
-  const [user] = useSelector(accountSelector);
+  const [user] = useSelector(signedUserSelector);
   const router = useRouter();
 
   const logout = useCallback(async () => {

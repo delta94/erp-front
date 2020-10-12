@@ -12,10 +12,13 @@ import { authorize } from '../../store/auth/actions';
 const Login = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  const [form] = Form.useForm();
 
-  const submit = useCallback(({ email, password }) => {
-    dispatch(authorize(email, password)).then(() => router.push('/users'));
-  }, [dispatch, router]);
+  const submit = useCallback(async ({ email, password }) => {
+    const { data, error } = await dispatch(authorize(email, password));
+    if (data) await router.push('/users');
+    if (error) form.setFields([{ name: 'password', errors: ['Invalid credentials'] }]);
+  }, [dispatch, router, form]);
 
   return (
     <Row className={styles.container}>
@@ -23,6 +26,7 @@ const Login = () => {
       <Col span={10} className={styles.right}>
         <Form
           name='login'
+          form={form}
           initialValues={{ remember: true }}
           onFinish={submit}
         >

@@ -1,5 +1,5 @@
 import {
-  FETCH_ACCOUNT, INIT_SESSION, LOGIN, LOGOUT, REGISTER,
+  FETCH_ACCOUNT, FETCH_SIGNED_USER, INIT_SESSION, LOGIN, LOGOUT, REGISTER,
 } from './types';
 
 export const login = (email, password) => ({
@@ -40,8 +40,8 @@ export const register = (data) => async (dispatch) => {
   return dispatch(signUp(data));
 };
 
-export const fetchAccount = () => ({
-  type: FETCH_ACCOUNT,
+export const fetchSignedUser = () => ({
+  type: FETCH_SIGNED_USER,
   request: {
     method: 'GET',
     url: '/user',

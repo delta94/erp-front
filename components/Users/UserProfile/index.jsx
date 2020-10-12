@@ -18,13 +18,14 @@ import UserProjects from './Projects';
 import UserPayments from './Payments';
 import UserCalendar from './Calendar';
 import UserWorktime from './Worktime';
-import { fetchUser, clearUser } from '../../../store/users/actions';
+import { fetchUser, clearUsers } from '../../../store/users/actions';
 import { userSelector } from '../../../store/users/selectors';
 import { formatCurrency, wildcard } from '../../../utils';
-import { accountSelector } from '../../../store/auth/selectors';
+import { signedUserSelector } from '../../../store/auth/selectors';
 import {
   USER_ROLE, USER_ROLE_COLORS, USER_STATUS_COLORS, PERMISSION,
 } from '../../../utils/constants';
+import GuardedLink from '../../common/GuardedLink';
 
 const CARD_STYLE = {
   headStyle: {
@@ -77,13 +78,13 @@ const Loader = ({ spanSize = 12 }) => (
 const UserProfile = () => {
   const dispatch = useDispatch();
   const { back, query } = useRouter();
-  const [account] = useSelector(accountSelector);
+  const [account] = useSelector(signedUserSelector);
   const [user, loading, isFound] = useSelector(userSelector);
 
   useEffect(() => {
     if (query.id) dispatch(fetchUser(query.id));
 
-    return () => dispatch(clearUser());
+    return () => dispatch(clearUsers());
   }, [dispatch, query]);
 
   const renderTab = useCallback((tab, idx) => (
@@ -119,7 +120,9 @@ const UserProfile = () => {
                   <Typography.Text strong className={styles.name}>
                     { user.name }
                     <br />
-                    <Tag color={USER_ROLE_COLORS[user.role] || 'cyan'}>{ user.role }</Tag>
+                    { user.roles?.map((role, idx) => (
+                      <Tag key={idx.toString()} color={USER_ROLE_COLORS[role] || 'cyan'}>{ role }</Tag>
+                    )) }
                     <Tag color={USER_STATUS_COLORS[user.status] || 'default'}>{ user.status }</Tag>
                   </Typography.Text>
                 </div>
@@ -134,7 +137,7 @@ const UserProfile = () => {
             >
               <Skeleton loading={loading} active>
                 <Can
-                  perform='rate:view'
+                  perform={wildcard(PERMISSION.VIEW_USER_RATE, user.id)}
                   yes={(
                     <Typography.Text className={styles.description} copyable>
                       <Tooltip title='Rate'><DollarOutlined /></Tooltip>
@@ -201,7 +204,18 @@ const UserProfile = () => {
         subTitle={user.name}
         onBack={back}
         extra={[
-          <Can key={0} perform='users:edit' yes={<Button key={0} type='primary'>Edit</Button>} />,
+          <GuardedLink
+            key={0}
+            gate={{
+              any: [wildcard(PERMISSION.EDIT_USERS, user.id)],
+              except: [wildcard(`!${PERMISSION.EDIT_USERS}`, user.id)],
+            }}
+            href='/users/[id]/edit'
+            as={`/users/${user.id}/edit`}
+            hideIfFailed
+          >
+            <Button type='primary'>Edit</Button>
+          </GuardedLink>,
         ]}
       />
       {

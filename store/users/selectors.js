@@ -18,6 +18,11 @@ export const userRolesSelector = (state) => [
   state.users.roles.loading,
 ];
 
+export const userStatusesSelector = (state) => [
+  state.users.statuses.data,
+  state.users.statuses.loading,
+];
+
 export const userRaisesSelector = (state) => [
   state.users.raises.data,
   state.users.raises.total,

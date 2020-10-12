@@ -1,1 +1,6 @@
 export const FETCH_ACCOUNTS = 'FETCH_ACCOUNTS';
+export const FETCH_ACCOUNT = 'FETCH_ACCOUNT';
+export const ADD_ACCOUNT = 'ADD_ACCOUNT';
+export const EDIT_ACCOUNT = 'EDIT_ACCOUNT';
+export const DELETE_ACCOUNT = 'DELETE_ACCOUNT';
+export const CLEAR_ACCOUNTS = 'CLEAR_ACCOUNTS';

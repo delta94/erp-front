@@ -10,7 +10,9 @@ import {
   FETCH_USER_WORKTIME,
   FETCH_USER_CALENDAR,
   DELETE_USER_WORKTIME,
-  CLEAR_USER, CLEAR_USER_SUB_STATE,
+  CLEAR_USERS,
+  CLEAR_USER_SUB_STATE,
+  FETCH_USER_STATUSES,
 } from './types';
 import {
   mutateSubState, mapPaginationResponse, removeDeletedItemFromList, mapError,
@@ -45,6 +47,7 @@ const initialState = {
   worktime: { ...subState },
   calendar: { ...subState },
   roles: { ...subState },
+  statuses: { ...subState },
 };
 
 export const reducer = (state = initialState, action) => {
@@ -61,6 +64,7 @@ export const reducer = (state = initialState, action) => {
     case FETCH_USER_WORKTIME:
     case FETCH_USER_CALENDAR:
     case FETCH_USER_ROLES:
+    case FETCH_USER_STATUSES:
       return mutateSubState(state, action, { loading: true });
 
     case success(FETCH_USERS):
@@ -80,12 +84,13 @@ export const reducer = (state = initialState, action) => {
     case success(FETCH_USER_WORKTIME):
     case success(FETCH_USER_CALENDAR):
     case success(FETCH_USER_ROLES):
+    case success(FETCH_USER_STATUSES):
       return mutateSubState(state, action, mapPaginationResponse);
 
     case error(FETCH_USERS):
       return { ...state, loading: false };
 
-    case CLEAR_USER:
+    case CLEAR_USERS:
     case error(FETCH_USER):
       return { ...state, ...singleEntity };
 
@@ -98,6 +103,7 @@ export const reducer = (state = initialState, action) => {
     case error(FETCH_USER_WORKTIME):
     case error(FETCH_USER_CALENDAR):
     case error(FETCH_USER_ROLES):
+    case error(FETCH_USER_STATUSES):
       return mutateSubState(state, action, mapError);
 
     default: return state;

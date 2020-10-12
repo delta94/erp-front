@@ -27,6 +27,7 @@ export const fetchProjectStatuses = () => ({
     method: 'GET',
     url: '/projects/statuses',
   },
+  meta: { subState: 'statuses' },
 });
 
 export const addProject = ({

@@ -5,7 +5,7 @@ import {
   PageHeader, Row, Col, Card, Avatar, Typography, Tag, Skeleton, Result, Empty, Button, Tabs,
 } from 'antd';
 import {
-  ShareAltOutlined, ProjectOutlined, ScheduleOutlined,
+  ShareAltOutlined, ProjectOutlined, ScheduleOutlined, LinkedinOutlined, RedditOutlined,
 } from '@ant-design/icons';
 
 import styles from '../Clients.module.scss';
@@ -16,6 +16,7 @@ import { fetchClient } from '../../../store/clients/actions';
 import { clientSelector } from '../../../store/clients/selectors';
 import { ORIGIN_COLORS, PERMISSION } from '../../../utils/constants';
 import { wildcard } from '../../../utils';
+import GuardedLink from '../../common/GuardedLink';
 
 const CARD_STYLE = {
   headStyle: {
@@ -51,6 +52,14 @@ const Loader = ({ spanSize = 12 }) => (
     </Card>
   </Col>
 );
+
+const getIconForLink = (type) => {
+  switch (type) {
+    case 'linkedin': return <LinkedinOutlined />;
+    case 'reddit': return <RedditOutlined />;
+    default: return <ShareAltOutlined />;
+  }
+};
 
 const ClientProfile = () => {
   const dispatch = useDispatch();
@@ -116,13 +125,13 @@ const ClientProfile = () => {
                     : client.links.map((link, idx) => (
                       <Typography.Link
                         key={idx.toString()}
-                        href={`https://${link}`}
+                        href={`https://${link.value}`}
                         className={styles.description}
                         target='_blank'
                         rel='noopener noreferrer'
                       >
-                        <ShareAltOutlined />
-                        { link }
+                        { getIconForLink(link.type) }
+                        { link.value }
                       </Typography.Link>
                     ))
                 }
@@ -155,7 +164,14 @@ const ClientProfile = () => {
         subTitle={client?.name}
         onBack={back}
         extra={[
-          <Button key={0} type='primary'>Edit</Button>,
+          <GuardedLink
+            key={0}
+            gate={{ any: [wildcard(PERMISSION.EDIT_CLIENTS, client.id)] }}
+            href='/clients/[id]/edit'
+            as={`/clients/${client.id}/edit`}
+          >
+            <Button type='primary'>Edit</Button>
+          </GuardedLink>,
         ]}
       />
       {

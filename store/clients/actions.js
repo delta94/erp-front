@@ -1,5 +1,5 @@
 import {
-  ADD_CLIENT, FETCH_CLIENT, FETCH_CLIENT_FIELD_TYPES, FETCH_CLIENT_ORIGINS, FETCH_CLIENTS,
+  ADD_CLIENT, EDIT_CLIENT, FETCH_CLIENT, FETCH_CLIENT_FIELD_TYPES, FETCH_CLIENT_ORIGINS, FETCH_CLIENTS,
 } from './types';
 import { composeQuery } from '../../utils';
 
@@ -34,12 +34,27 @@ export const addClient = ({ photos, ...data }) => {
   };
 };
 
+export const editClient = (id, { photos, ...data }) => {
+  const payload = { ...data };
+  payload.photos = photos.map((photo) => photo.response?.id || photo.id).filter((photo) => !!photo);
+
+  return {
+    type: EDIT_CLIENT,
+    request: {
+      method: 'PATCH',
+      url: `/clients/${id}`,
+      data: payload,
+    },
+  };
+};
+
 export const fetchClientOrigins = () => ({
   type: FETCH_CLIENT_ORIGINS,
   request: {
     method: 'GET',
     url: '/clients/origins',
   },
+  meta: { subState: 'origins' },
 });
 
 export const fetchClientFieldTypes = () => ({
@@ -48,12 +63,14 @@ export const fetchClientFieldTypes = () => ({
     method: 'GET',
     url: '/clients/fields',
   },
+  meta: { subState: 'fieldTypes' },
 });
 
-export const fetchClient = (id) => ({
+export const fetchClient = (id, params) => ({
   type: FETCH_CLIENT,
   request: {
     method: 'GET',
     url: `/clients/${id}`,
+    params,
   },
 });

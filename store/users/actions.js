@@ -9,9 +9,11 @@ import {
   FETCH_USER_CALENDAR,
   DELETE_USER_WORKTIME,
   ADD_USER_WORKTIME,
-  CLEAR_USER,
+  CLEAR_USERS,
   CLEAR_USER_SUB_STATE,
   FETCH_USER_PROJECT_DETAILS,
+  FETCH_USER_STATUSES,
+  ADD_USER, EDIT_USER,
 } from './types';
 import { composeQuery } from '../../utils';
 
@@ -36,14 +38,15 @@ export const fetchUserRoles = () => ({
     method: 'GET',
     url: '/users/roles',
   },
-}
-);
+  meta: { subState: 'roles' },
+});
 
-export const fetchUser = (id) => ({
+export const fetchUser = (id, params) => ({
   type: FETCH_USER,
   request: {
     method: 'GET',
     url: `/users/${id}`,
+    params,
   },
 });
 
@@ -151,8 +154,8 @@ export const addUserWorktime = (id, data) => ({
   },
 });
 
-export const clearUser = () => ({
-  type: CLEAR_USER,
+export const clearUsers = () => ({
+  type: CLEAR_USERS,
 });
 
 export const clearUserSubState = (name) => ({
@@ -168,3 +171,44 @@ export const fetchUserProjectDetails = (userId, projectId, meta = {}) => ({
   },
   meta,
 });
+
+export const fetchUserStatuses = () => ({
+  type: FETCH_USER_STATUSES,
+  request: {
+    method: 'GET',
+    url: '/users/statuses',
+  },
+  meta: { subState: 'statuses' },
+});
+
+export const addUser = ({
+  photos, ...data
+}) => {
+  const payload = { ...data };
+  if (photos) {
+    payload.photos = photos.map((photo) => photo.response?.id).filter((photo) => !!photo);
+  }
+
+  return {
+    type: ADD_USER,
+    request: {
+      method: 'POST',
+      url: '/users',
+      data: payload,
+    },
+  };
+};
+
+export const editUser = (id, { photos, ...data }) => {
+  const payload = { ...data };
+  payload.photos = photos.map((photo) => photo.response?.id || photo.id).filter((photo) => !!photo);
+
+  return {
+    type: EDIT_USER,
+    request: {
+      method: 'PATCH',
+      url: `/users/${id}`,
+      data: payload,
+    },
+  };
+};

@@ -1,5 +1,5 @@
-import AuthorizedLayout from '../../components/common/Layout/Authorized';
-import ClientProfile from '../../components/Clients/ClientProfile';
+import AuthorizedLayout from '../../../components/common/Layout/Authorized';
+import ClientProfile from '../../../components/Clients/ClientProfile';
 
 const ClientProfilePage = () => (
   <AuthorizedLayout title='dygit'>

@@ -1,8 +1,9 @@
 import AuthorizedLayout from '../../components/common/Layout/Authorized';
+import AddUser from '../../components/Users/AddUser';
 
 const AddUserPage = () => (
   <AuthorizedLayout title='dygit'>
-    new user
+    <AddUser />
   </AuthorizedLayout>
 );
 

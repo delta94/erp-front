@@ -10,7 +10,7 @@ import styles from './Invite.module.scss';
 import { fetchInvitationByCode } from '../../store/invitations/actions';
 import { invitationSelector } from '../../store/invitations/selectors';
 import { register } from '../../store/auth/actions';
-import { accountSelector } from '../../store/auth/selectors';
+import { signedUserSelector } from '../../store/auth/selectors';
 import { parseErrors } from '../../utils';
 
 const Invite = () => {
@@ -18,7 +18,7 @@ const Invite = () => {
   const [form] = Form.useForm();
   const { query, push } = useRouter();
   const [invitation, loading, isFound] = useSelector(invitationSelector);
-  const [, authLoading] = useSelector(accountSelector);
+  const [, authLoading] = useSelector(signedUserSelector);
 
   useEffect(() => {
     if (query.code) dispatch(fetchInvitationByCode(query.code));

@@ -15,6 +15,7 @@ import clients from './clients/reducer';
 import payments from './payments/reducer';
 import expenses from './expenses/reducer';
 import accounts from './accounts/reducer';
+import tags from './tags/reducer';
 import { BASE_URL } from '../utils/constants';
 
 const loggerMiddleware = createLogger();
@@ -45,6 +46,7 @@ const rootReducer = combineReducers({
   payments,
   expenses,
   accounts,
+  tags,
 });
 
 const middlewares = [

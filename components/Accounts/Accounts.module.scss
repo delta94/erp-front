@@ -1,0 +1,21 @@
+@import "styles/common";
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.uploadInput {
+  margin-top: 30px;
+}
+
+.uploadWrap {
+  & > div {
+    width: 100%;
+  }
+}
+
+.submit {
+  float: right;
+}

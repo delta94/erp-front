@@ -1,4 +1,8 @@
-import { CURRENCY_SYMBOLS, EXTENSIONS } from './constants';
+import crypto from 'crypto-js';
+
+import {
+  CURRENCY_SYMBOLS, EXTENSIONS, KEY, SALT,
+} from './constants';
 
 /**
  *
@@ -210,4 +214,14 @@ export function downloadBlob(blob, fileName) {
 export function getFileName(header) {
   const [, group] = /attachment; filename="(.*)"/gm.exec(header);
   return group;
+}
+
+export function prefixedName(prefix, name) {
+  return prefix ? [prefix, name] : name;
+}
+
+export function decryptPassword(password, hexIv) {
+  const key = crypto.PBKDF2(KEY, SALT, { hasher: crypto.algo.SHA512, keySize: 64 / 8, iterations: 256 });
+  const iv = crypto.enc.Hex.parse(hexIv);
+  return crypto.AES.decrypt(password, key, { iv, mode: crypto.mode.CBC }).toString(crypto.enc.Utf8);
 }

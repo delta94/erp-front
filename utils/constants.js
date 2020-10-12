@@ -2,6 +2,10 @@ import moment from 'moment';
 
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
+export const KEY = process.env.NEXT_PUBLIC_KEY || 'key';
+
+export const SALT = process.env.NEXT_PUBLIC_SALT || 'salt';
+
 export const COUNTRIES = [
   { name: 'Afghanistan', code: 'AF' },
   { name: 'Åland Islands', code: 'AX' },
@@ -252,6 +256,8 @@ export const CLIENT_FIELD_TYPE = {
   WEBSITE: 'website',
   LINK: 'link',
   OTHER: 'other',
+  REDDIT: 'reddit',
+  LINKEDIN: 'linkedin',
 };
 
 export const EXTENSIONS = {
@@ -328,7 +334,7 @@ export const ORIGIN_COLORS = {
   upwork: 'green',
   freelancer: 'geekblue',
   linkedin: 'blue',
-  reddit: 'orange',
+  reddit: 'red',
   payoneer: 'orange',
 };
 
@@ -352,6 +358,7 @@ export const RESPONSE_MODE = {
   SIMPLIFIED: 'simplified',
   FULL: 'full',
   MINIMAL: 'minimal',
+  ORIGINAL: 'original',
 };
 
 export const CURRENCY_SYMBOLS = {
@@ -395,6 +402,8 @@ export const USER_STATUS_COLORS = {
   active: 'green',
   vacation: 'geekblue',
   'on sick leave': 'red',
+  suspended: 'orange',
+  fired: 'volcano',
 };
 
 export const WORKDAYS = (() => {
@@ -436,6 +445,7 @@ export const PERMISSION = {
   VIEW_USER_ACCOUNTS: 'users[info:accounts].view',
   VIEW_USER_RAISES_PROJECT: 'users[info:raises[type:project]].view',
   VIEW_USER_RAISES_PERSONAL: 'users[info:raises[type:personal]].view',
+  VIEW_USER_RATE: 'users[info:rate].view',
 
   VIEW_CLIENT_PAYMENTS: 'clients[info:payments].view',
   VIEW_CLIENT_PROJECTS: 'clients[info:projects].view',
@@ -450,4 +460,10 @@ export const PERMISSION = {
   ADD_WORKTIME: 'worktime.create',
   ADD_RAISES: 'raises.create',
   ADD_USERS: 'users.create',
+
+  EDIT_USERS: 'users.update',
+  EDIT_CLIENTS: 'clients.update',
+  EDIT_ACCOUNTS: 'accounts.update',
+
+  DELETE_ACCOUNTS: 'accounts.delete',
 };

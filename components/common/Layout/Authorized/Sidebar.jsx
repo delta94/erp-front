@@ -4,16 +4,21 @@ import Link from 'next/link';
 import { Layout as AntLayout, Menu } from 'antd';
 import {
   MailOutlined, DeploymentUnitOutlined, UnorderedListOutlined, TeamOutlined, SolutionOutlined, DollarCircleOutlined,
-  BankOutlined, WalletOutlined,
+  BankOutlined, WalletOutlined, ContactsOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 
 import { useSelector } from 'react-redux';
 import styles from '../Layout.module.scss';
 import { USER_ROLE } from '../../../../utils/constants';
-import { accountSelector } from '../../../../store/auth/selectors';
+import { signedUserSelector } from '../../../../store/auth/selectors';
 
 const LINKS = {
+  ACCOUNTS: {
+    title: 'Accounts',
+    icon: ContactsOutlined,
+    route: '/accounts',
+  },
   USERS: {
     title: 'Users',
     icon: TeamOutlined,
@@ -36,13 +41,13 @@ const LINKS = {
 };
 
 const LINKS_MAP = {
-  [USER_ROLE.ADMIN]: [LINKS.USERS, LINKS.PROJECTS, LINKS.CLIENTS, LINKS.BUDGET],
-  [USER_ROLE.MANAGER]: [LINKS.USERS_LIST, LINKS.PROJECTS, LINKS.CLIENTS],
+  [USER_ROLE.ADMIN]: [LINKS.USERS, LINKS.ACCOUNTS, LINKS.PROJECTS, LINKS.CLIENTS, LINKS.BUDGET],
+  [USER_ROLE.MANAGER]: [LINKS.USERS_LIST, LINKS.ACCOUNTS, LINKS.PROJECTS, LINKS.CLIENTS],
 };
 
 const Sidebar = ({ collapsed }) => {
   const router = useRouter();
-  const [user] = useSelector(accountSelector);
+  const [user] = useSelector(signedUserSelector);
 
   const [openedKey, selectedKey] = useMemo(
     () => {
@@ -56,7 +61,9 @@ const Sidebar = ({ collapsed }) => {
         if (res) tree.push(link.title);
         return res;
       };
-      const arr = LINKS_MAP[user?.role] || [];
+      let arr = [];
+      if (user?.roles?.includes(USER_ROLE.ADMIN)) arr = LINKS_MAP[USER_ROLE.ADMIN];
+      else if (user?.roles?.includes(USER_ROLE.ADMIN)) arr = LINKS_MAP[USER_ROLE.MANAGER];
       for (let i = 0; i < arr.length; i += 1) {
         if (rec(arr[i])) {
           return [tree.slice(0, tree.length - 1).join('-'), tree.join('-')];
@@ -92,7 +99,9 @@ const Sidebar = ({ collapsed }) => {
   }, []);
 
   const links = useMemo(() => {
-    const array = LINKS_MAP[user?.role] || [];
+    let array = [];
+    if (user?.roles?.includes(USER_ROLE.ADMIN)) array = LINKS_MAP[USER_ROLE.ADMIN];
+    else if (user?.roles?.includes(USER_ROLE.ADMIN)) array = LINKS_MAP[USER_ROLE.MANAGER];
     return array.map((item, idx) => renderMenuItems(item, idx));
   }, [renderMenuItems, user]);
 

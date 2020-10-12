@@ -32,22 +32,6 @@
   float: right;
 }
 
-.badge {
-  margin-left: 4px;
-}
-
-.removeWrap {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.remove {
-  padding-right: 0;
-  padding-left: 0;
-  float: right;
-}
-
 .datePicker {
   width: 100%;
 }
@@ -55,4 +39,9 @@
 .list {
   margin: 0;
   padding: 0;
+}
+
+.container {
+  background-color: #fff;
+  border-radius: 4px;
 }
