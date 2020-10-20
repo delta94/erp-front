@@ -9,6 +9,7 @@ export function mapPaginationResponse(state, action) {
     }),
     total: action.response.data.total,
     loading: false,
+    response: { ...state.response, found: true },
   };
 
   if (
@@ -52,6 +53,25 @@ export function mutateSubState(state, action, stateOrMutation) {
   return { ...state };
 }
 
+/**
+ * @param {Object} state
+ * @param {Object} action
+ * @param {Object|Function} stateOrMutation
+ * @param {?String} field
+ */
+export function mutateState(state, action, stateOrMutation, field = null) {
+  if (typeof stateOrMutation === 'function') {
+    return field
+      ? { ...state, [field]: { ...state[field], ...stateOrMutation(state, action) } }
+      : { ...state, ...stateOrMutation(state, action) };
+  }
+  return field ? { ...state, [field]: { ...state[field], ...stateOrMutation } } : { ...state, ...stateOrMutation };
+}
+
+/**
+ * @param {Object} state
+ * @param {Object} action
+ */
 export function mapSingleEntityResponse(state, action) {
   return {
     ...state,
@@ -67,14 +87,15 @@ export function mapSingleEntityResponse(state, action) {
 /**
  * @param {Object} state
  * @param {Object} action
- * @param {String} itemField
+ * @param {?String} itemField
  */
-export function mapError(state, action, itemField) {
+export function mapError(state, action, itemField = null) {
   const newState = itemField ? { ...state[itemField], loading: false } : { ...state, loading: false };
 
   switch (action.error?.response?.status) {
     case 404: newState.response.found = false; break;
     case 403: newState.response.forbidden = true; break;
+    case 500: newState.response.serverError = true; break;
     default: break;
   }
 

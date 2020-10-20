@@ -1,0 +1,15 @@
+@import "styles/common";
+
+.badge {
+  margin-left: 4px;
+}
+
+.table {
+  thead > tr > th {
+    background-color: transparent !important;
+  }
+
+  tbody > tr:last-of-type > td {
+    border-bottom: none;
+  }
+}

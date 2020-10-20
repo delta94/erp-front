@@ -1,21 +1,24 @@
 import {
-  useEffect, useCallback, useMemo, useState,
+  useEffect, useCallback, useState, useMemo,
 } from 'react';
 import Link from 'next/link';
 import {
-  Button, Table, Badge, Tag, Space, message,
+  Button, Table, Badge, Tag, Space, message, Popconfirm,
 } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { DownloadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, DownloadOutlined, EditOutlined } from '@ant-design/icons';
 
 import styles from './Payments.module.scss';
 import usePagination from '../../utils/hooks/usePagination';
-import { fetchPayments, generateInvoice } from '../../store/payments/actions';
+import GuardedLink from '../common/GuardedLink';
+import SuspenseLoader from '../common/SuspenseLoader';
+import Can from '../common/Can';
+import { deletePayment, fetchPayments, generateInvoice } from '../../store/payments/actions';
 import { paymentsSelector } from '../../store/payments/selectors';
 import {
-  EXTENSIONS, ORIGIN_COLORS, PAYMENT_STATUS_COLORS, RESPONSE_MODE,
+  EXTENSIONS, ORIGIN_COLORS, PAYMENT_STATUS_COLORS, PERMISSION, RESPONSE_MODE,
 } from '../../utils/constants';
-import { downloadBlob, getFileName } from '../../utils';
+import { downloadBlob, getFileName, wildcard } from '../../utils';
 
 const NESTED_COLUMNS = [
   {
@@ -32,11 +35,82 @@ const NESTED_COLUMNS = [
   },
 ];
 
+const COLUMNS = [
+  {
+    title: 'From',
+    dataIndex: 'client',
+    // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
+    render: (client) => <Link href='/clients/[id]' as={`/clients/${client.id}`}><a>{client.name}</a></Link>,
+  },
+  {
+    title: 'To',
+    dataIndex: 'user',
+    // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
+    render: (user) => <Link href='/users/[id]' as={`/users/${user.id}`}><a>{user.name}</a></Link>,
+  },
+  {
+    title: 'Account',
+    dataIndex: 'account',
+    // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
+    render: (account) => <Tag color={ORIGIN_COLORS[account.type]}>{account.type}</Tag>,
+  },
+  {
+    title: 'Amount',
+    dataIndex: 'amount',
+  },
+  {
+    title: 'Status',
+    dataIndex: 'status',
+    render: (status) => <Badge status={PAYMENT_STATUS_COLORS[status]} text={status} />,
+  },
+  {
+    title: 'Created At',
+    dataIndex: 'created_at',
+  },
+  {
+    title: 'Actions',
+    render: (row, record) => (
+      <>
+        <Button
+          type='link'
+          icon={<DownloadOutlined />}
+          onClick={() => record.handleDownload(row)}
+          loading={record.queue.includes(row.id)}
+        >
+          Invoice
+        </Button>
+        <GuardedLink
+          gate={wildcard(PERMISSION.EDIT_PAYMENTS, record.id)}
+          href='/payments/[id]/edit'
+          as={`/payments/${record.id}/edit`}
+          hideIfFailed
+        >
+          <Button type='link' icon={<EditOutlined />}>Edit</Button>
+        </GuardedLink>
+        <Can
+          perform={wildcard(PERMISSION.DELETE_PAYMENTS, record.id)}
+          yes={(
+            <Popconfirm title='Sure to delete?' onConfirm={() => record.handleDelete(record.id)}>
+              <Button type='link' danger icon={<DeleteOutlined />}>
+                Delete
+              </Button>
+            </Popconfirm>
+          )}
+        />
+      </>
+    ),
+  },
+];
+
 const Payments = () => {
   const dispatch = useDispatch();
   const [payments, total, loading] = useSelector(paymentsSelector);
   const [pagination, paginationOptions] = usePagination();
   const [queue, setQueue] = useState([]);
+
+  const fetchData = useCallback(() => {
+    dispatch(fetchPayments({ ...pagination, mode: RESPONSE_MODE.SIMPLIFIED }));
+  }, [dispatch, pagination]);
 
   const handleDownload = useCallback(async (row) => {
     setQueue((state) => [...state, row.id]);
@@ -57,54 +131,14 @@ const Payments = () => {
     }
   }, [dispatch]);
 
-  const columns = useMemo(() => ([
-    {
-      title: 'From',
-      dataIndex: 'client',
-      // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
-      render: (client) => <Link href='/clients/[id]' as={`/clients/${client.id}`}><a>{client.name}</a></Link>,
-    },
-    {
-      title: 'To',
-      dataIndex: 'user',
-      // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
-      render: (user) => <Link href='/users/[id]' as={`/users/${user.id}`}><a>{user.name}</a></Link>,
-    },
-    {
-      title: 'Account',
-      dataIndex: 'account',
-      // eslint-disable-next-line react/display-name,jsx-a11y/anchor-is-valid
-      render: (account) => <Tag color={ORIGIN_COLORS[account.type]}>{account.type}</Tag>,
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'amount',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      render: (status) => <Badge status={PAYMENT_STATUS_COLORS[status]} text={status} />,
-    },
-    {
-      title: 'Created At',
-      dataIndex: 'created_at',
-    },
-    {
-      title: 'Actions',
-      render: (row) => (
-        <Space size='middle'>
-          <Button
-            type='link'
-            icon={<DownloadOutlined />}
-            onClick={() => handleDownload(row)}
-            loading={queue.includes(row.id)}
-          >
-            Invoice
-          </Button>
-        </Space>
-      ),
-    },
-  ]), [handleDownload, queue]);
+  const handleDelete = useCallback(async (id) => {
+    const { data, error } = await dispatch(deletePayment(id));
+    if (data) {
+      message.success(data);
+      fetchData();
+    }
+    if (error) message.error('Unable to delete payment');
+  }, [dispatch, fetchData]);
 
   const expandedRowRender = useCallback((row) => (
     <Table
@@ -114,24 +148,32 @@ const Payments = () => {
     />
   ), []);
 
+  const dataSource = useMemo(
+    () => payments.map((payment) => ({
+      ...payment, handleDelete, handleDownload, queue,
+    })),
+    [payments, handleDownload, handleDelete, queue],
+  );
+
   useEffect(() => {
-    dispatch(fetchPayments({ ...pagination, mode: RESPONSE_MODE.SIMPLIFIED }));
-  }, [dispatch, pagination]);
+    fetchData();
+  }, [fetchData]);
 
   return (
     <>
-      <div className={styles.buttons}>
-        <Button type='primary'>
-          <Link href='/payments/new'>
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-            <a>Add</a>
-          </Link>
-        </Button>
-      </div>
+      <SuspenseLoader loading={loading} className={styles.buttons}>
+        <Space className={styles.buttons}>
+          <GuardedLink href='/payments/new' gate={PERMISSION.ADD_PAYMENTS} hideIfFailed>
+            <Button type='primary'>
+              Add
+            </Button>
+          </GuardedLink>
+        </Space>
+      </SuspenseLoader>
       <Table
-        columns={columns}
+        columns={COLUMNS}
         loading={loading}
-        dataSource={payments}
+        dataSource={dataSource}
         expandable={{ expandedRowRender }}
         pagination={{
           total,

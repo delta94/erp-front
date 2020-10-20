@@ -1,0 +1,20 @@
+.card {
+  border-radius: 4px;
+
+  &:last-of-type {
+    min-height: 133px;
+  }
+}
+
+.description {
+  font-size: 0.875rem;
+}
+
+.titleIcon {
+  padding: 0;
+  margin-bottom: 4px;
+  svg {
+    width: 25px;
+    height: 25px;
+  }
+}

@@ -1,66 +1,25 @@
 import { createSelector } from 'reselect';
+import { entitySelector, singleEntitySelector } from '../selectors';
 
-export const usersSelector = (state) => [
-  state.users.data,
-  state.users.total,
-  state.users.loading,
-  state.users.filters,
-];
+const ENTITY = 'users';
 
-export const userSelector = (state) => [
-  state.users.user,
-  state.users.userLoading,
-  state.users.userFound,
-];
+export const usersSelector = (state) => entitySelector(ENTITY)(state);
 
-export const userRolesSelector = (state) => [
-  state.users.roles.data,
-  state.users.roles.loading,
-];
+export const userSelector = (state) => singleEntitySelector(ENTITY)(state);
 
-export const userStatusesSelector = (state) => [
-  state.users.statuses.data,
-  state.users.statuses.loading,
-];
+export const userRolesSelector = (state) => entitySelector(ENTITY, 'roles')(state);
 
-export const userRaisesSelector = (state) => [
-  state.users.raises.data,
-  state.users.raises.total,
-  state.users.raises.loading,
-  state.users.raises.filters,
-  state.users.raises.forbidden,
-];
+export const userStatusesSelector = (state) => entitySelector(ENTITY, 'statuses')(state);
 
-export const userProjectsSelector = (state) => [
-  state.users.projects.data,
-  state.users.projects.total,
-  state.users.projects.loading,
-  state.users.projects.filters,
-  state.users.projects.forbidden,
-];
+export const userRaisesSelector = (state) => entitySelector(ENTITY, 'raises')(state);
 
-export const userPaymentsSelector = (state) => [
-  state.users.payments.data,
-  state.users.payments.total,
-  state.users.payments.loading,
-  state.users.payments.filters,
-  state.users.payments.forbidden,
-];
+export const userProjectsSelector = (state) => entitySelector(ENTITY, 'projects')(state);
 
-export const userWorktimeSelector = (state) => [
-  state.users.worktime.data,
-  state.users.worktime.total,
-  state.users.worktime.loading,
-  state.users.worktime.filters,
-  state.users.worktime.forbidden,
-];
+export const userPaymentsSelector = (state) => entitySelector(ENTITY, 'payments')(state);
 
-export const userCalendarSelector = (state) => [
-  state.users.calendar.data,
-  state.users.calendar.total,
-  state.users.calendar.loading,
-  state.users.calendar.filters,
-];
+export const userWorktimeSelector = (state) => entitySelector(ENTITY, 'worktime')(state);
+
+export const userCalendarSelector = (state) => entitySelector(ENTITY, 'calendar')(state);
 
 export const userMappedCalendarSelector = createSelector(
   userCalendarSelector,

@@ -12,6 +12,7 @@ import { clearUserSubState, fetchUserRaises } from '../../../../store/users/acti
 import { userRaisesSelector } from '../../../../store/users/selectors';
 import { formatCurrency } from '../../../../utils';
 import { signedUserSelector } from '../../../../store/auth/selectors';
+import EntityAccessMiddleware from '../../../common/EntityAccessMiddleware';
 
 const COLUMNS = {
   TYPE: {
@@ -49,7 +50,7 @@ const MAP = {
 const UserRaises = () => {
   const dispatch = useDispatch();
   const { query } = useRouter();
-  const [projects, total, loading, , forbidden] = useSelector(userRaisesSelector);
+  const [projects, total, loading, , response] = useSelector(userRaisesSelector);
   const [pagination, paginationOptions] = usePagination();
   const [user] = useSelector(signedUserSelector);
 
@@ -65,11 +66,8 @@ const UserRaises = () => {
     return () => dispatch(clearUserSubState('raises'));
   }, [dispatch, query, pagination]);
 
-  return forbidden
-    ? (
-      <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='No Access' />
-    )
-    : (
+  return (
+    <EntityAccessMiddleware entityName='raises' mode='simple' loading={loading} response={response}>
       <Table
         size='small'
         loading={loading}
@@ -84,7 +82,8 @@ const UserRaises = () => {
           ...paginationOptions,
         }}
       />
-    );
+    </EntityAccessMiddleware>
+  );
 };
 
 export default UserRaises;

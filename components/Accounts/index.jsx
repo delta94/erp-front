@@ -1,21 +1,25 @@
-import { useEffect, useMemo, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useCallback, useEffect, useMemo } from 'react';
 import {
-  Table, Space, Button, Tag, Popconfirm, message,
+  Button, message, Popconfirm, Popover, Space, Table, Tag, Tooltip,
 } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import Link from 'next/link';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { useDispatch, useSelector } from 'react-redux';
 
 import styles from './Accounts.module.scss';
-import Can from '../common/Can';
 import HiddenPassword from './components/HiddenPassword';
 import GuardedLink from '../common/GuardedLink';
+import SuspenseLoader from '../common/SuspenseLoader';
+import Can from '../common/Can';
 import usePagination from '../../utils/hooks/usePagination';
 import useFilters from '../../utils/hooks/useFilters';
-import { ORIGIN_COLORS, PERMISSION, RESPONSE_MODE } from '../../utils/constants';
 import { wildcard } from '../../utils';
 import { accountsSelector } from '../../store/accounts/selectors';
 import { deleteAccount, fetchAccounts } from '../../store/accounts/actions';
+import {
+  ACCOUNT_CATEGORY,
+  ACCOUNT_CATEGORY_COLOR,
+  ACCOUNT_CATEGORY_ICON, ORIGIN_COLORS, PERMISSION, RESPONSE_MODE,
+} from '../../utils/constants';
 
 const COLUMNS = [
   {
@@ -33,16 +37,63 @@ const COLUMNS = [
     render: (type) => <Tag color={ORIGIN_COLORS[type] || 'default'}>{ type }</Tag>,
   },
   {
+    title: 'Category',
+    dataIndex: 'category',
+    render: (category, record) => {
+      const Icon = ACCOUNT_CATEGORY_ICON[category];
+      const tag = (
+        <Tag color={ACCOUNT_CATEGORY_COLOR[category] || 'default'}>
+          <Icon />
+          &nbsp;
+          { category }
+        </Tag>
+      );
+
+      if (ACCOUNT_CATEGORY.PROJECT && record.project) {
+        const content = (
+          <GuardedLink
+            gate={wildcard(PERMISSION.VIEW_PROJECTS, record.project.id)}
+            href='/projects/[id]'
+            as={`/projects/${record.project.id}`}
+            label={record.project.title}
+          />
+        );
+        return (
+          <Popover content={content}>
+            { tag }
+          </Popover>
+        );
+      }
+
+      return tag;
+    },
+  },
+  {
     title: 'Owner',
     dataIndex: 'owner',
-    render: (owner) => (
-      <GuardedLink
-        gate={wildcard(PERMISSION.VIEW_USERS, owner.id)}
-        href='/users/[id]'
-        as={`/users/${owner.id}`}
-        label={owner.name}
-      />
-    ),
+    render: (ownerOrParentAccount) => (ownerOrParentAccount.category === ACCOUNT_CATEGORY.AVATAR
+      ? (
+        <GuardedLink
+          gate={wildcard(PERMISSION.VIEW_ACCOUNTS, ownerOrParentAccount.id)}
+          href='/accounts/[id]/edit'
+          as={`/accounts/${ownerOrParentAccount.id}/edit`}
+        >
+          <Tooltip title='This account is owned by another account'>
+            <Tag color={ownerOrParentAccount.color}>
+              { ownerOrParentAccount.type }
+            </Tag>
+          </Tooltip>
+          &nbsp;
+          { ownerOrParentAccount.name }
+        </GuardedLink>
+      ) : (
+        <GuardedLink
+          gate={wildcard(PERMISSION.VIEW_USERS, ownerOrParentAccount.id)}
+          href='/users/[id]'
+          as={`/users/${ownerOrParentAccount.id}`}
+          label={ownerOrParentAccount.name}
+        />
+      )),
   },
   {
     title: 'Actions',
@@ -50,8 +101,8 @@ const COLUMNS = [
       <>
         <GuardedLink
           gate={wildcard(PERMISSION.EDIT_ACCOUNTS, record.id)}
-          as='/accounts/[id]/edit'
-          href={`/accounts/${record.id}/edit`}
+          href='/accounts/[id]/edit'
+          as={`/accounts/${record.id}/edit`}
           hideIfFailed
         >
           <Button type='link' icon={<EditOutlined />}>Edit</Button>
@@ -103,13 +154,15 @@ const Accounts = () => {
 
   return (
     <>
-      <Space className={styles.buttons}>
-        <Button type='primary'>
-          <Link href='/accounts/new'>
-            <a>Add</a>
-          </Link>
-        </Button>
-      </Space>
+      <SuspenseLoader loading={loading} className={styles.buttons}>
+        <Space className={styles.buttons}>
+          <GuardedLink href='/accounts/new' gate={PERMISSION.ADD_ACCOUNTS} hideIfFailed>
+            <Button type='primary'>
+              Add
+            </Button>
+          </GuardedLink>
+        </Space>
+      </SuspenseLoader>
       <Table
         className={styles.rounded}
         loading={loading}

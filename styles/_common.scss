@@ -36,3 +36,41 @@
   padding-left: 0;
   float: right;
 }
+
+.avatarWrap {
+  display: flex;
+  align-items: center;
+}
+
+
+.name {
+  margin-left: 10px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.submit {
+  float: right;
+}
+
+.relative {
+  position: relative;
+}
+
+.smallTable {
+  thead > tr > th {
+    background-color: transparent !important;
+  }
+
+  tbody > tr:last-of-type > td {
+    border-bottom: none;
+  }
+}
+
+.noPadding {
+  padding: 0 !important;
+}

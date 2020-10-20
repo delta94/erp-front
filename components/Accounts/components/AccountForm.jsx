@@ -1,5 +1,5 @@
 import {
-  useCallback, useEffect, useMemo,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 import {
   Form, Row, Col, Input, Button, Select, Tag, Spin,
@@ -11,11 +11,17 @@ import PropTypes from 'prop-types';
 
 import styles from '../Accounts.module.scss';
 import { clearUsers, fetchUsers } from '../../../store/users/actions';
-import { RESPONSE_MODE } from '../../../utils/constants';
+import {
+  ACCOUNT_CATEGORY, ACCOUNT_CATEGORY_COLOR, RESPONSE_MODE,
+} from '../../../utils/constants';
 import { usersSelector } from '../../../store/users/selectors';
 import { mapOptions } from '../../../utils';
 import { tagsSelector } from '../../../store/tags/selectors';
 import { addTag, fetchTags } from '../../../store/tags/actions';
+import { accountCategoriesSelector } from '../../../store/accounts/selectors';
+import { clearAccounts, fetchAccountCategories } from '../../../store/accounts/actions';
+import { clearProjects, fetchProjectAccounts, fetchProjects } from '../../../store/projects/actions';
+import { projectAccountsSelector, projectsSelector } from '../../../store/projects/selectors';
 
 const AccountForm = ({
   onSubmit, submitting, initialValues, formRef, ...props
@@ -23,10 +29,18 @@ const AccountForm = ({
   const dispatch = useDispatch();
   const { events } = useRouter();
   const [form] = Form.useForm();
+  const [val, setValues] = useState(form.getFieldsValue());
+  const [categories, , categoriesLoading] = useSelector(accountCategoriesSelector);
+  const [accounts, , accountsLoading] = useSelector(projectAccountsSelector);
+  const [projects, , projectsLoading] = useSelector(projectsSelector);
   const [users, , usersLoading] = useSelector(usersSelector);
   const [tags, , tagsLoading] = useSelector(tagsSelector);
 
-  const handleRouteChange = useCallback(() => dispatch(clearUsers()), [dispatch]);
+  const handleRouteChange = useCallback(() => {
+    dispatch(clearUsers());
+    dispatch(clearProjects());
+    dispatch(clearAccounts());
+  }, [dispatch]);
 
   const ownerOptions = useMemo(() => mapOptions(users), [users]);
 
@@ -35,6 +49,23 @@ const AccountForm = ({
       { label.props?.children || label }
     </Tag>
   ), []);
+
+  const projectOptions = useMemo(() => mapOptions(projects), [projects]);
+
+  const accountOptions = useMemo(() => accounts.map((a, idx) => (
+    <Select.Option key={idx.toString()} value={a.id} label={a.name}>
+      <Tag color={a.color}>{ a.type }</Tag>
+      { a.name }
+    </Select.Option>
+  )), [accounts]);
+
+  const categoryOptions = useMemo(() => categories.map((category, idx) => (
+    <Select.Option key={idx.toString()} value={category} label={category}>
+      <Tag color={ACCOUNT_CATEGORY_COLOR[category] || 'default'}>
+        {category}
+      </Tag>
+    </Select.Option>
+  )), [categories]);
 
   const tagOptions = useMemo(() => tags.map((tag, idx) => (
     <Select.Option key={idx.toString()} value={tag.name} label={tag.name}>
@@ -96,7 +127,20 @@ const AccountForm = ({
     </Row>
   )), []);
 
+  const handleFormChange = useCallback((event) => {
+    if (event.category === ACCOUNT_CATEGORY.PROJECT) {
+      dispatch(fetchProjects({ mode: RESPONSE_MODE.MINIMAL }));
+    }
+    if (event.project) {
+      dispatch(fetchProjectAccounts(event.project, {
+        mode: RESPONSE_MODE.MINIMAL, filters: [{ name: 'category', value: [ACCOUNT_CATEGORY.AVATAR] }],
+      }));
+    }
+    setValues(form.getFieldsValue());
+  }, [dispatch, form]);
+
   useEffect(() => {
+    dispatch(fetchAccountCategories());
     dispatch(fetchUsers({ mode: RESPONSE_MODE.MINIMAL }));
     dispatch(fetchTags({ mode: RESPONSE_MODE.SIMPLIFIED, filters: [{ name: 'category', value: ['account'] }] }));
     events.on('routeChangeStart', handleRouteChange);
@@ -105,7 +149,14 @@ const AccountForm = ({
 
   useEffect(() => {
     form.resetFields();
-  }, [form, initialValues]);
+    if (initialValues?.category) {
+      handleFormChange({ category: initialValues.category });
+    }
+    if (initialValues?.project) {
+      handleFormChange({ project: initialValues.project });
+    }
+    setValues(initialValues);
+  }, [form, initialValues, handleFormChange]);
 
   useEffect(() => {
     // eslint-disable-next-line no-param-reassign
@@ -117,9 +168,41 @@ const AccountForm = ({
       form={form}
       layout='vertical'
       initialValues={initialValues}
+      onValuesChange={handleFormChange}
       {...props}
     >
       <Row gutter={10}>
+        <Col span={12}>
+          <Form.Item
+            label='Category'
+            name='category'
+            rules={[{ required: true, message: 'Category is required' }]}
+          >
+            <Select
+              placeholder='Category'
+              loading={categoriesLoading}
+            >
+              {categoryOptions}
+            </Select>
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          {
+            val.category === ACCOUNT_CATEGORY.PROJECT && (
+              <Form.Item
+                label='Project'
+                name='project'
+                rules={[{ required: true, message: 'Project is required' }]}
+              >
+                <Select
+                  placeholder='Project'
+                  loading={projectsLoading}
+                  options={projectOptions}
+                />
+              </Form.Item>
+            )
+          }
+        </Col>
         <Col span={12}>
           <Form.Item
             label='Type'
@@ -147,13 +230,33 @@ const AccountForm = ({
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item
-            label='Owner'
-            name='owner'
-            rules={[{ required: true, message: 'Owner is required' }]}
-          >
-            <Select placeholder='Owner' options={ownerOptions} loading={usersLoading} />
-          </Form.Item>
+          {
+            val.category === ACCOUNT_CATEGORY.PROJECT
+              ? (
+                <Form.Item
+                  label='Avatar'
+                  name='account'
+                  rules={[{ required: true, message: 'Avatar is required' }]}
+                >
+                  <Select
+                    placeholder='Avatar'
+                    loading={accountsLoading}
+                    disabled={!val.project || !accountOptions.length}
+                  >
+                    { accountOptions }
+                  </Select>
+                </Form.Item>
+              )
+              : (
+                <Form.Item
+                  label='Owner'
+                  name='owner'
+                  rules={[{ required: true, message: 'Owner is required' }]}
+                >
+                  <Select placeholder='Owner' options={ownerOptions} loading={usersLoading} />
+                </Form.Item>
+              )
+          }
         </Col>
         <Col span={12}>
           <Form.Item

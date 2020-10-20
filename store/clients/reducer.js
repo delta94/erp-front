@@ -3,41 +3,24 @@ import { success, error } from '@redux-requests/core';
 import {
   FETCH_CLIENT, FETCH_CLIENT_FIELD_TYPES, FETCH_CLIENT_ORIGINS, FETCH_CLIENTS,
 } from './types';
-import { mapError, mapPaginationResponse, mutateSubState } from '../mutations';
-
-const subState = {
-  data: [],
-  filters: {},
-  total: 0,
-  loading: false,
-  forbidden: false,
-};
-
-const singleEntity = {
-  client: {},
-  clientLoading: true,
-  found: false,
-  forbidden: false,
-};
+import {
+  mapError, mapPaginationResponse, mapSingleEntityResponse, mutateState, mutateSubState,
+} from '../mutations';
+import { ENTITY_STATE_STANDARD, SINGLE_ENTITY_STATE_STANDARD } from '../../utils/constants';
 
 const initialState = {
-  total: 0,
-  data: [],
-  filters: {},
-  loading: false,
-
-  ...singleEntity,
-
-  origins: { ...subState },
-  fieldTypes: { ...subState },
+  ...ENTITY_STATE_STANDARD,
+  item: { ...SINGLE_ENTITY_STATE_STANDARD },
+  origins: { ...ENTITY_STATE_STANDARD },
+  fieldTypes: { ...ENTITY_STATE_STANDARD },
 };
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_CLIENTS:
-      return { ...state, loading: true };
+      return mutateState(state, action, { loading: true });
     case FETCH_CLIENT:
-      return { ...state, clientLoading: true };
+      return mutateState(state, action, { loading: true }, 'item');
 
     case FETCH_CLIENT_FIELD_TYPES:
     case FETCH_CLIENT_ORIGINS:
@@ -51,19 +34,17 @@ export const reducer = (state = initialState, action) => {
       return mutateSubState(state, action, mapPaginationResponse);
 
     case success(FETCH_CLIENT):
-      return {
-        ...state, client: action.response.data, clientLoading: false, found: true,
-      };
+      return mapSingleEntityResponse(state, action);
 
     case error(FETCH_CLIENTS):
-      return { ...state, loading: false };
+      return mapError(state, action);
 
     case error(FETCH_CLIENT_ORIGINS):
     case error(FETCH_CLIENT_FIELD_TYPES):
       return mutateSubState(state, action, mapError);
 
     case error(FETCH_CLIENT):
-      return { ...state, found: false, clientLoading: false };
+      return mapError(state, action, 'item');
 
     default: return state;
   }

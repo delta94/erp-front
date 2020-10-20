@@ -1,6 +1,4 @@
-import {
-  useState, useCallback, useEffect, useMemo,
-} from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {

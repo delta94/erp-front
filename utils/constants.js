@@ -1,4 +1,25 @@
 import moment from 'moment';
+import { UserOutlined, ContactsOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
+
+export const RESPONSE_OBJECT_STANDARD = {
+  forbidden: false,
+  found: false,
+  serverError: false,
+};
+
+export const SINGLE_ENTITY_STATE_STANDARD = {
+  data: {},
+  loading: true,
+  response: { ...RESPONSE_OBJECT_STANDARD },
+};
+
+export const ENTITY_STATE_STANDARD = {
+  total: 0,
+  data: [],
+  filters: {},
+  loading: false,
+  response: { ...RESPONSE_OBJECT_STANDARD },
+};
 
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -361,6 +382,11 @@ export const RESPONSE_MODE = {
   ORIGINAL: 'original',
 };
 
+export const ACCOUNT_TYPE = {
+  UPWORK: 'upwork',
+  PAYONEER: 'payoneer',
+};
+
 export const CURRENCY_SYMBOLS = {
   usd: '$', // US Dollar
   uah: '₴', // Ukrainian Hryvnia
@@ -406,6 +432,24 @@ export const USER_STATUS_COLORS = {
   fired: 'volcano',
 };
 
+export const ACCOUNT_CATEGORY = {
+  AVATAR: 'avatar',
+  GENERAL: 'general',
+  PROJECT: 'project',
+};
+
+export const ACCOUNT_CATEGORY_ICON = {
+  [ACCOUNT_CATEGORY.AVATAR]: UserOutlined,
+  [ACCOUNT_CATEGORY.GENERAL]: ContactsOutlined,
+  [ACCOUNT_CATEGORY.PROJECT]: DeploymentUnitOutlined,
+};
+
+export const ACCOUNT_CATEGORY_COLOR = {
+  [ACCOUNT_CATEGORY.AVATAR]: 'green',
+  [ACCOUNT_CATEGORY.GENERAL]: 'magenta',
+  [ACCOUNT_CATEGORY.PROJECT]: 'cyan',
+};
+
 export const WORKDAYS = (() => {
   const workingWeekdays = [1, 2, 3, 4, 5];
   let currentDay = moment().startOf('month');
@@ -447,6 +491,11 @@ export const PERMISSION = {
   VIEW_USER_RAISES_PERSONAL: 'users[info:raises[type:personal]].view',
   VIEW_USER_RATE: 'users[info:rate].view',
 
+  VIEW_PROJECT_PROFITS: 'projects[info:profits].view',
+  VIEW_PROJECT_WORKTIME: 'projects[info:worktime].view',
+  VIEW_PROJECT_RAISES_PROJECT: 'projects[info:raises[type:project]].view',
+  VIEW_PROJECT_RAISES_WEEKLY_LIMIT: 'projects[info:raises[type:weekly_limit]].view',
+
   VIEW_CLIENT_PAYMENTS: 'clients[info:payments].view',
   VIEW_CLIENT_PROJECTS: 'clients[info:projects].view',
   VIEW_CLIENT_ABOUT: 'clients[info:about].view',
@@ -460,10 +509,43 @@ export const PERMISSION = {
   ADD_WORKTIME: 'worktime.create',
   ADD_RAISES: 'raises.create',
   ADD_USERS: 'users.create',
+  ADD_CLIENTS: 'clients.create',
+  ADD_ACCOUNTS: 'accounts.create',
+  ADD_PROJECTS: 'projects.create',
+  ADD_PAYMENTS: 'payments.create',
+  ADD_EXPENSES: 'expenses.create',
 
   EDIT_USERS: 'users.update',
   EDIT_CLIENTS: 'clients.update',
   EDIT_ACCOUNTS: 'accounts.update',
+  EDIT_PROJECTS: 'projects.update',
+  EDIT_PAYMENTS: 'payments.update',
+  EDIT_EXPENSES: 'expenses.update',
 
   DELETE_ACCOUNTS: 'accounts.delete',
+  DELETE_PAYMENTS: 'payments.delete',
+};
+
+export const PROGRESS_CARD_STYLE = {
+  headStyle: {
+    borderBottom: 'none',
+    padding: '0 12px',
+  },
+  bodyStyle: {
+    padding: '0 12px 12px 12px',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+};
+
+export const CARD_STYLE = {
+  headStyle: {
+    borderBottom: 'none',
+    padding: '0 12px',
+  },
+  bodyStyle: {
+    padding: '0 12px 12px 12px',
+    display: 'flex',
+    flexDirection: 'column',
+  },
 };

@@ -15,48 +15,28 @@ import {
   FETCH_USER_STATUSES,
 } from './types';
 import {
-  mutateSubState, mapPaginationResponse, removeDeletedItemFromList, mapError,
+  mutateSubState, mapPaginationResponse, removeDeletedItemFromList, mapError, mutateState, mapSingleEntityResponse,
 } from '../mutations';
-
-const subState = {
-  data: [],
-  filters: {},
-  total: 0,
-  loading: false,
-  forbidden: false,
-};
-
-const singleEntity = {
-  user: {},
-  userLoading: true,
-  found: false,
-  forbidden: false,
-};
+import { ENTITY_STATE_STANDARD, SINGLE_ENTITY_STATE_STANDARD } from '../../utils/constants';
 
 const initialState = {
-  data: [],
-  filters: {},
-  total: 0,
-  loading: true,
-
-  ...singleEntity,
-
-  raises: { ...subState },
-  projects: { ...subState },
-  payments: { ...subState },
-  worktime: { ...subState },
-  calendar: { ...subState },
-  roles: { ...subState },
-  statuses: { ...subState },
+  ...ENTITY_STATE_STANDARD,
+  item: { ...SINGLE_ENTITY_STATE_STANDARD },
+  raises: { ...ENTITY_STATE_STANDARD },
+  projects: { ...ENTITY_STATE_STANDARD },
+  payments: { ...ENTITY_STATE_STANDARD },
+  worktime: { ...ENTITY_STATE_STANDARD },
+  calendar: { ...ENTITY_STATE_STANDARD },
+  roles: { ...ENTITY_STATE_STANDARD },
+  statuses: { ...ENTITY_STATE_STANDARD },
 };
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_USERS:
-      return { ...state, loading: true };
-
+      return mutateState(state, action, { loading: true });
     case FETCH_USER:
-      return { ...state, userLoading: true, userFound: false };
+      return mutateState(state, action, { loading: true }, 'item');
 
     case FETCH_USER_PAYMENTS:
     case FETCH_USER_RAISES:
@@ -69,12 +49,8 @@ export const reducer = (state = initialState, action) => {
 
     case success(FETCH_USERS):
       return mapPaginationResponse(state, action);
-
     case success(FETCH_USER):
-      return {
-        ...state, userLoading: false, user: action.response.data, userFound: true,
-      };
-
+      return mapSingleEntityResponse(state, action);
     case success(DELETE_USER_WORKTIME):
       return mutateSubState(state, action, removeDeletedItemFromList);
 
@@ -88,14 +64,14 @@ export const reducer = (state = initialState, action) => {
       return mutateSubState(state, action, mapPaginationResponse);
 
     case error(FETCH_USERS):
-      return { ...state, loading: false };
+      return mapError(state, action);
+    case error(FETCH_USER):
+      return mapError(state, action, 'item');
 
     case CLEAR_USERS:
-    case error(FETCH_USER):
-      return { ...state, ...singleEntity };
-
+      return mutateState(state, action, { ...ENTITY_STATE_STANDARD });
     case CLEAR_USER_SUB_STATE:
-      return mutateSubState(state, action, subState);
+      return mutateSubState(state, action, ENTITY_STATE_STANDARD);
 
     case error(FETCH_USER_PAYMENTS):
     case error(FETCH_USER_RAISES):

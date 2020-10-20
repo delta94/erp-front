@@ -2,7 +2,7 @@ import {
   useCallback, useState, useRef, useEffect, useMemo,
 } from 'react';
 import {
-  Form, Input, Button, Col, Row, Select, Upload, Switch, Badge, DatePicker, Tag,
+  Form, Input, Button, Col, Row, Select, Upload, Switch, Badge, DatePicker, Tag, Divider,
 } from 'antd';
 import { UploadOutlined, PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 import styles from '../Projects.module.scss';
 import usePhotos from '../../../utils/hooks/usePhoto';
 import {
-  URLS, BASE_URL, STATUS_COLORS, RESPONSE_MODE, USER_ROLE, ORIGIN_COLORS,
+  URLS, BASE_URL, STATUS_COLORS, RESPONSE_MODE, USER_ROLE, ORIGIN_COLORS, ACCOUNT_TYPE,
 } from '../../../utils/constants';
 import {
   getXsrfToken, normFile, ucFirst, filterByLabel, mapOptions,
@@ -38,7 +38,6 @@ const ProjectForm = ({
   const [clients, , clientsLoading] = useSelector(clientsSelector);
   const [users, , usersLoading] = useSelector(usersSelector);
   const [accounts, , accountsLoading] = useSelector(accountsSelector);
-  const [isPending, setPending] = useState(form.getFieldsValue(['status']).status === 'pending');
 
   const statusOptions = useMemo(() => statuses.map((s, idx) => (
     <Select.Option key={idx.toString()} value={s}>
@@ -64,7 +63,7 @@ const ProjectForm = ({
   )), [accounts]);
 
   const renderDeveloperFields = useCallback((fields, { remove }) => fields.map((field, idx) => (
-    <Row key={idx.toString()} gutter={10}>
+    <Row key={idx.toString()} gutter={10} className={styles.relative}>
       <Col span={12}>
         <Form.Item
           label='Developer'
@@ -96,7 +95,16 @@ const ProjectForm = ({
           </Select>
         </Form.Item>
       </Col>
-      <Col span={4}>
+      <Col span={5}>
+        <Form.Item
+          label='Status'
+          name={[idx, 'status']}
+          required
+        >
+          <Select placeholder='Status' loading={statusesLoading}>{ statusOptions }</Select>
+        </Form.Item>
+      </Col>
+      <Col span={5}>
         <Form.Item
           label='Rate'
           name={[idx, 'rate']}
@@ -108,7 +116,16 @@ const ProjectForm = ({
           <Input placeholder='Rate $' type='number' />
         </Form.Item>
       </Col>
-      <Col span={4}>
+      <Col span={6}>
+        <Form.Item
+          label='Weekly limit'
+          name={[idx, 'weekly_limit']}
+          className={styles.labelAlign}
+        >
+          <Input placeholder='Leave empty if unlimited' type='number' />
+        </Form.Item>
+      </Col>
+      <Col span={5}>
         <Form.Item
           label='Start Date'
           name={[idx, 'start_date']}
@@ -127,28 +144,64 @@ const ProjectForm = ({
           <Switch />
         </Form.Item>
       </Col>
-      <Col span={2} className={styles.removeWrap}>
-        {
-          fields.length > 1 && (
-            <Button
-              type='link'
-              icon={<MinusCircleOutlined />}
-              onClick={() => remove(field.name)}
-              className={styles.remove}
-            />
-          )
-        }
-      </Col>
+      {
+        fields.length > 1 && (
+          <Button
+            type='link'
+            icon={<MinusCircleOutlined style={{ fontSize: '15px' }} />}
+            onClick={() => remove(field.name)}
+            className={styles.removeButton}
+            title='Remove row'
+          />
+        )
+      }
+      { fields.length > 1 && (<Divider className={styles.dividerSmall} />) }
     </Row>
-  )), [developerOptions, accountOptions, accountsLoading, usersLoading]);
+  )), [developerOptions, accountOptions, accountsLoading, usersLoading, statusOptions, statusesLoading]);
+
+  const renderAdditionalFields = useCallback((fields, { remove }) => fields.map((field, idx) => (
+    <Row key={idx.toString()} gutter={10}>
+      <Col span={10}>
+        <Form.Item
+          label='Field name'
+          name={[idx, 'name']}
+          rules={[{ required: true, message: 'Field name is required' }]}
+        >
+          <Input placeholder='Name' />
+        </Form.Item>
+      </Col>
+      <Col span={14}>
+        <Form.Item
+          label='Value'
+          name={[idx, 'value']}
+          rules={[{ required: true, message: 'Field value is required' }]}
+        >
+          <Input placeholder='Value' />
+        </Form.Item>
+      </Col>
+      <Button
+        type='link'
+        icon={<MinusCircleOutlined style={{ fontSize: '15px' }} />}
+        onClick={() => remove(field.name)}
+        className={styles.removeButton}
+        title='Remove row'
+      />
+    </Row>
+  )), []);
 
   const handleRouteChange = useCallback(() => dispatch(clearAccounts()), [dispatch]);
 
   useEffect(() => {
     dispatch(fetchProjectStatuses());
     dispatch(fetchClients({ mode: RESPONSE_MODE.MINIMAL }));
-    dispatch(fetchAccounts({ mode: RESPONSE_MODE.MINIMAL }));
-    dispatch(fetchUsers({ mode: RESPONSE_MODE.MINIMAL, roles: ['developer', 'manager'] }));
+    dispatch(fetchAccounts({
+      mode: RESPONSE_MODE.MINIMAL,
+      filters: [{ name: 'type', value: [ACCOUNT_TYPE.PAYONEER, ACCOUNT_TYPE.UPWORK] }],
+    }));
+    dispatch(fetchUsers({
+      mode: RESPONSE_MODE.MINIMAL,
+      filters: [{ name: 'role', value: [USER_ROLE.DEVELOPER, USER_ROLE.MANAGER] }],
+    }));
     events.on('routeChangeStart', handleRouteChange);
     return () => events.off('routeChangeStart', handleRouteChange);
   }, [dispatch, events, handleRouteChange]);
@@ -174,7 +227,7 @@ const ProjectForm = ({
       {...props}
     >
       <Row gutter={10}>
-        <Col span={12}>
+        <Col span={24}>
           <Form.Item
             label='Project Title'
             name='title'
@@ -185,6 +238,8 @@ const ProjectForm = ({
           >
             <Input placeholder="Project's title" />
           </Form.Item>
+        </Col>
+        <Col span={12}>
           <Form.Item
             label='Client'
             name='client'
@@ -201,38 +256,8 @@ const ProjectForm = ({
               showSearch
             />
           </Form.Item>
-          {
-            isPending && (
-              <Form.Item
-                label='Start Date'
-                name='start_date'
-                required
-                rules={[
-                  { required: true, message: 'Please select project\'s Start Date!' },
-                ]}
-              >
-                <DatePicker className={styles.datePicker} />
-              </Form.Item>
-            )
-          }
         </Col>
         <Col span={12}>
-          <Form.Item
-            label='Status'
-            name='status'
-            required
-            rules={[
-              { required: true, message: 'Please select project\'s Status!' },
-            ]}
-          >
-            <Select
-              placeholder='Project status'
-              loading={statusesLoading}
-              onChange={() => setPending(form.getFieldsValue(['status']).status === 'pending')}
-            >
-              { statusOptions }
-            </Select>
-          </Form.Item>
           <Form.Item
             label='Managers'
             name='managers'
@@ -251,7 +276,16 @@ const ProjectForm = ({
             />
           </Form.Item>
         </Col>
+        <Col span={24}>
+          <Form.Item
+            label='Description'
+            name='description'
+          >
+            <Input.TextArea placeholder='Project description' />
+          </Form.Item>
+        </Col>
       </Row>
+      <Divider className={styles.divider}>Developers</Divider>
       <Row gutter={10}>
         <Col span={24}>
           <Form.List label='Developers' name='developers' required>
@@ -275,11 +309,12 @@ const ProjectForm = ({
           </Form.List>
         </Col>
       </Row>
+      <Divider className={styles.divider}>Photos</Divider>
       <Row gutter={10}>
         <Col span={12}>
           <Form.Item
             name='photos'
-            label='Photo'
+            label='Photos'
             valuePropName='fileList'
             getValueFromEvent={normFile}
           >
@@ -313,6 +348,30 @@ const ProjectForm = ({
           />
         </Col>
       </Row>
+      <Divider className={styles.divider}>Additional Fields</Divider>
+      <Row gutter={10}>
+        <Col span={24}>
+          <Form.List label='Additional Fields' name='fields' required>
+            {
+              (...args) => (
+                <>
+                  {renderAdditionalFields(...args)}
+                  <Form.Item>
+                    <Button
+                      type='dashed'
+                      onClick={() => args[1].add()}
+                      block
+                    >
+                      <PlusOutlined />
+                      Add field
+                    </Button>
+                  </Form.Item>
+                </>
+              )
+            }
+          </Form.List>
+        </Col>
+      </Row>
       <Row gutter={10}>
         <Col span={24}>
           <Form.Item noStyle>
@@ -340,7 +399,7 @@ ProjectForm.propTypes = {
 };
 
 ProjectForm.defaultProps = {
-  initialValues: {},
+  initialValues: null,
   submitting: false,
   onSubmit: () => {},
   formRef: null,

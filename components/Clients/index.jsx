@@ -1,12 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Table, Button, Tag } from 'antd';
+import {
+  Table, Button, Tag, Space,
+} from 'antd';
 import Link from 'next/link';
 
 import styles from './Clients.module.scss';
+import SuspenseLoader from '../common/SuspenseLoader';
 import { clientsSelector } from '../../store/clients/selectors';
 import { fetchClients } from '../../store/clients/actions';
-import { ORIGIN_COLORS, RESPONSE_MODE } from '../../utils/constants';
+import { ORIGIN_COLORS, PERMISSION, RESPONSE_MODE } from '../../utils/constants';
+import GuardedLink from '../common/GuardedLink';
 
 const COLUMNS = [
   {
@@ -49,14 +53,15 @@ const Clients = () => {
 
   return (
     <>
-      <div className={styles.buttons}>
-        <Button type='primary'>
-          <Link href='/clients/new'>
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-            <a>Add</a>
-          </Link>
-        </Button>
-      </div>
+      <SuspenseLoader loading={loading} className={styles.buttons}>
+        <Space className={styles.buttons}>
+          <GuardedLink href='/clients/new' gate={PERMISSION.ADD_CLIENTS} hideIfFailed>
+            <Button type='primary'>
+              Add
+            </Button>
+          </GuardedLink>
+        </Space>
+      </SuspenseLoader>
       <Table
         loading={loading}
         dataSource={clients}

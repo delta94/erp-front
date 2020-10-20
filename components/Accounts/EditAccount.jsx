@@ -1,15 +1,14 @@
 import {
   useCallback, useState, useRef, useEffect, useMemo,
 } from 'react';
-import {
-  Card, message, PageHeader, Result,
-} from 'antd';
+import { Card, message, PageHeader } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import styles from './Accounts.module.scss';
 import AccountForm from './components/AccountForm';
-import { parseErrors } from '../../utils';
+import EntityAccessMiddleware from '../common/EntityAccessMiddleware';
+import { decryptPassword, parseErrors } from '../../utils';
 import { editAccount, fetchAccount } from '../../store/accounts/actions';
 import { accountSelector } from '../../store/accounts/selectors';
 import { RESPONSE_MODE } from '../../utils/constants';
@@ -42,8 +41,11 @@ const EditAccount = () => {
 
   const initialValues = useMemo(() => (Object.keys(account).length > 0 ? ({
     ...account,
-    owner: account.owner.id,
+    owner: account.owner?.id,
+    account: account.account?.id,
+    project: account.project?.id,
     type: [account.type.name],
+    password: decryptPassword(account.password, account.iv),
   }) : ({})), [account]);
 
   useEffect(() => {
@@ -57,20 +59,16 @@ const EditAccount = () => {
         title='Edit Account'
         onBack={back}
       />
-      {
-        !response.found && !loading
-          ? <Result status='404' title='Not Found' subTitle='Sorry, such client does not exist.' />
-          : (
-            <Card className={styles.container}>
-              <AccountForm
-                onSubmit={handleSubmit}
-                submitting={submitting}
-                initialValues={initialValues}
-                formRef={form}
-              />
-            </Card>
-          )
-      }
+      <EntityAccessMiddleware entityName='client' loading={loading} response={response}>
+        <Card className={styles.container}>
+          <AccountForm
+            onSubmit={handleSubmit}
+            submitting={submitting}
+            initialValues={initialValues}
+            formRef={form}
+          />
+        </Card>
+      </EntityAccessMiddleware>
     </>
   );
 };

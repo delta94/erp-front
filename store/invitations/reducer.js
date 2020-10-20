@@ -1,38 +1,32 @@
 import { error, success } from '@redux-requests/core';
 
 import { FETCH_INVITATIONS, FETCH_INVITATION_BY_CODE } from './types';
-import { mapPaginationResponse } from '../mutations';
+import {
+  mapError, mapPaginationResponse, mapSingleEntityResponse, mutateState,
+} from '../mutations';
+import { ENTITY_STATE_STANDARD, SINGLE_ENTITY_STATE_STANDARD } from '../../utils/constants';
 
 const initialState = {
-  data: [],
-  total: 0,
-  loading: false,
-  invitation: null,
-  invitationLoading: true,
-  invitationFound: false,
+  ...ENTITY_STATE_STANDARD,
+  item: { ...SINGLE_ENTITY_STATE_STANDARD },
 };
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_INVITATIONS:
-      return { ...state, loading: true };
-
+      return mutateState(state, action, { loading: true });
     case FETCH_INVITATION_BY_CODE:
-      return { ...state, invitationLoading: true, invitationFound: false };
+      return mutateState(state, action, { loading: true }, 'item');
 
     case success(FETCH_INVITATIONS):
       return mapPaginationResponse(state, action);
-
     case success(FETCH_INVITATION_BY_CODE):
-      return {
-        ...state, invitation: action.response.data, invitationFound: true, invitationLoading: false,
-      };
+      return mapSingleEntityResponse(state, action);
 
     case error(FETCH_INVITATIONS):
-      return { ...state, loading: false };
-
+      return mapError(state, action);
     case error(FETCH_INVITATION_BY_CODE):
-      return { ...state, invitationFound: false, invitationLoading: false };
+      return mapError(state, action, 'item');
 
     default: return state;
   }

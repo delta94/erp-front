@@ -1,12 +1,7 @@
-export const tagsSelector = (state) => [
-  state.tags.data,
-  state.tags.total,
-  state.tags.loading,
-  state.tags.filters,
-];
+import { entitySelector, singleEntitySelector } from '../selectors';
 
-export const tagSelector = (state) => [
-  state.tags.item.data,
-  state.tags.item.loading,
-  state.tags.item.response,
-];
+const ENTITY = 'tags';
+
+export const tagsSelector = (state) => entitySelector(ENTITY)(state);
+
+export const tagSelector = (state) => singleEntitySelector(ENTITY)(state);

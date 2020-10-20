@@ -25,6 +25,7 @@ export const fetchExpenseStatuses = () => ({
     method: 'GET',
     url: '/expenses/statuses',
   },
+  meta: { subState: 'statuses' },
 });
 
 export const addExpense = (data) => ({

@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useMemo, useCallback } from 'react';
 import {
-  PageHeader, Row, Col, Card, Avatar, Typography, Tag, Skeleton, Result, Button, Tabs, Tooltip,
+  PageHeader, Row, Col, Card, Avatar, Typography, Tag, Skeleton, Button, Tabs, Tooltip,
 } from 'antd';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,6 +18,9 @@ import UserProjects from './Projects';
 import UserPayments from './Payments';
 import UserCalendar from './Calendar';
 import UserWorktime from './Worktime';
+import GuardedLink from '../../common/GuardedLink';
+import EntityAccessMiddleware from '../../common/EntityAccessMiddleware';
+import SuspenseLoader from '../../common/SuspenseLoader';
 import { fetchUser, clearUsers } from '../../../store/users/actions';
 import { userSelector } from '../../../store/users/selectors';
 import { formatCurrency, wildcard } from '../../../utils';
@@ -25,7 +28,6 @@ import { signedUserSelector } from '../../../store/auth/selectors';
 import {
   USER_ROLE, USER_ROLE_COLORS, USER_STATUS_COLORS, PERMISSION,
 } from '../../../utils/constants';
-import GuardedLink from '../../common/GuardedLink';
 
 const CARD_STYLE = {
   headStyle: {
@@ -78,8 +80,8 @@ const Loader = ({ spanSize = 12 }) => (
 const UserProfile = () => {
   const dispatch = useDispatch();
   const { back, query } = useRouter();
-  const [account] = useSelector(signedUserSelector);
-  const [user, loading, isFound] = useSelector(userSelector);
+  const [signedUser] = useSelector(signedUserSelector);
+  const [user, loading, response] = useSelector(userSelector);
 
   useEffect(() => {
     if (query.id) dispatch(fetchUser(query.id));
@@ -101,7 +103,13 @@ const UserProfile = () => {
     </Tabs.TabPane>
   ), []);
 
-  const tabs = useMemo(() => (MAP[account?.role] || []).map(renderTab), [account, renderTab]);
+  const tabs = useMemo(() => {
+    const keys = Object.keys(MAP);
+    for (let i = 0; i < keys.length; i += 1) {
+      if (signedUser?.roles?.includes(keys[i])) return MAP[keys[i]].map(renderTab);
+    }
+    return null;
+  }, [signedUser, renderTab]);
 
   const content = useMemo(() => (
     <Row gutter={[16, 16]}>
@@ -204,25 +212,25 @@ const UserProfile = () => {
         subTitle={user.name}
         onBack={back}
         extra={[
-          <GuardedLink
-            key={0}
-            gate={{
-              any: [wildcard(PERMISSION.EDIT_USERS, user.id)],
-              except: [wildcard(`!${PERMISSION.EDIT_USERS}`, user.id)],
-            }}
-            href='/users/[id]/edit'
-            as={`/users/${user.id}/edit`}
-            hideIfFailed
-          >
-            <Button type='primary'>Edit</Button>
-          </GuardedLink>,
+          <SuspenseLoader loading={loading} key={0}>
+            <GuardedLink
+              gate={{
+                any: [wildcard(PERMISSION.EDIT_USERS, user.id)],
+                except: [wildcard(`!${PERMISSION.EDIT_USERS}`, user.id)],
+              }}
+              href='/users/[id]/edit'
+              as={`/users/${user.id}/edit`}
+              loading={loading}
+              hideIfFailed
+            >
+              <Button type='primary'>Edit</Button>
+            </GuardedLink>
+          </SuspenseLoader>,
         ]}
       />
-      {
-        !isFound && !loading
-          ? <Result status='404' title='Not Found' subTitle='Sorry, such user does not exist.' />
-          : content
-      }
+      <EntityAccessMiddleware entityName='user' loading={loading} response={response}>
+        { content }
+      </EntityAccessMiddleware>
     </>
   );
 };

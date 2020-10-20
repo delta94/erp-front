@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
-import {
-  Badge, Table, Result, Empty,
-} from 'antd';
+import { Badge, Table } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import styles from './Projects.module.scss';
 import usePagination from '../../../../utils/hooks/usePagination';
+import EntityAccessMiddleware from '../../../common/EntityAccessMiddleware';
 import { RESPONSE_MODE, STATUS_COLORS } from '../../../../utils/constants';
 import { clearUserSubState, fetchUserProjects } from '../../../../store/users/actions';
 import { userProjectsSelector } from '../../../../store/users/selectors';
@@ -36,14 +35,16 @@ const COLUMNS = [
   {
     title: 'Rate',
     dataIndex: 'rate',
-    render: (rate, { salary_based: salaryBased }) => `$ ${new Intl.NumberFormat().format(rate)} ${salaryBased ? 'monthly' : 'hourly'}`,
+    render: (rate, { salary_based: salaryBased }) => (
+      `$ ${new Intl.NumberFormat().format(rate)} ${salaryBased ? 'monthly' : 'hourly'}`
+    ),
   },
 ];
 
 const UserProjects = () => {
   const dispatch = useDispatch();
   const { query } = useRouter();
-  const [projects, total, loading, , forbidden] = useSelector(userProjectsSelector);
+  const [projects, total, loading, , response] = useSelector(userProjectsSelector);
   const [pagination, paginationOptions] = usePagination();
 
   useEffect(() => {
@@ -52,26 +53,22 @@ const UserProjects = () => {
   }, [dispatch, query, pagination]);
 
   return (
-    forbidden
-      ? (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='No Access' />
-      )
-      : (
-        <Table
-          size='small'
-          loading={loading}
-          dataSource={projects}
-          columns={COLUMNS}
-          scroll={{ x: 600 }}
-          className={styles.table}
-          showHeader={!!projects.length}
-          pagination={{
-            total,
-            size: 'small',
-            ...paginationOptions,
-          }}
-        />
-      )
+    <EntityAccessMiddleware entityName='projects' loading={loading} response={response} mode='simple'>
+      <Table
+        size='small'
+        loading={loading}
+        dataSource={projects}
+        columns={COLUMNS}
+        scroll={{ x: 600 }}
+        className={styles.table}
+        showHeader={!!projects.length}
+        pagination={{
+          total,
+          size: 'small',
+          ...paginationOptions,
+        }}
+      />
+    </EntityAccessMiddleware>
   );
 };
 

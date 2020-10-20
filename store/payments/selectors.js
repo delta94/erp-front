@@ -1,2 +1,9 @@
-export const paymentsSelector = (state) => [state.payments.data, state.payments.total, state.payments.loading];
-export const paymentStatusesSelector = (state) => [state.payments.statuses, state.payments.statusesLoading];
+import { entitySelector, singleEntitySelector } from '../selectors';
+
+const ENTITY = 'payments';
+
+export const paymentsSelector = (state) => entitySelector(ENTITY)(state);
+
+export const paymentSelector = (state) => singleEntitySelector(ENTITY)(state);
+
+export const paymentStatusesSelector = (state) => entitySelector(ENTITY, 'statuses')(state);

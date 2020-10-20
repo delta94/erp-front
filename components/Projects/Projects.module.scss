@@ -45,3 +45,130 @@
   background-color: #fff;
   border-radius: 4px;
 }
+
+.divider {
+  color: #d9d9d9 !important;
+}
+
+.dividerSmall {
+  @extend .divider;
+  width: 80%;
+}
+
+.removeButton {
+  position: absolute;
+  top: -4px;
+  right: 0;
+}
+
+.labelAlign {
+  label {
+    padding-bottom: 1px;
+  }
+}
+
+.relative {
+  position: relative;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+
+  button {
+    margin-right: 16px;
+  }
+
+  button:last-child {
+    margin-right: 0;
+  }
+}
+
+.pageHeader {
+  background-color: #fff;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.block {
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.avatarWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.name {
+  margin-left: 10px;
+}
+
+.description {
+  margin: 0;
+  padding: 0;
+
+  svg {
+    color: rgba(0, 0, 0, 0.65);
+    margin-right: 10px;
+  }
+}
+
+.titleWrap {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 400;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+}
+
+.titleIcon {
+  padding: 0;
+  margin-bottom: 4px;
+  svg {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+.card {
+  border-radius: 4px;
+}
+
+.progress {
+  width: 90%;
+}
+
+.table {
+  thead > tr > th {
+    background-color: transparent !important;
+  }
+
+  tbody > tr:last-of-type > td {
+    border-bottom: none;
+  }
+}
+
+.badge {
+  margin-left: 4px;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.block {
+  background-color: #fff;
+  border-radius: 4px;
+}
+

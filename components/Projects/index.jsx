@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Table, Button, Badge,
-} from 'antd';
+import { Table, Button, Space } from 'antd';
 import Link from 'next/link';
 
 import styles from './Projects.module.scss';
@@ -10,8 +8,9 @@ import usePagination from '../../utils/hooks/usePagination';
 import GuardedLink from '../common/GuardedLink';
 import { projectsSelector } from '../../store/projects/selectors';
 import { fetchProjects } from '../../store/projects/actions';
-import { PERMISSION, STATUS_COLORS } from '../../utils/constants';
+import { PERMISSION } from '../../utils/constants';
 import { wildcard } from '../../utils';
+import SuspenseLoader from '../common/SuspenseLoader';
 
 const COLUMNS = [
   {
@@ -79,12 +78,6 @@ const COLUMNS = [
     ),
   },
   {
-    title: 'Status',
-    dataIndex: 'status',
-    // eslint-disable-next-line react/display-name
-    render: (status) => <Badge text={status} status={STATUS_COLORS[status]} className={styles.status} />,
-  },
-  {
     title: 'Created At',
     dataIndex: 'created_at',
   },
@@ -101,14 +94,15 @@ const Projects = () => {
 
   return (
     <>
-      <div className={styles.buttons}>
-        <Button type='primary'>
-          <Link href='/projects/new'>
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-            <a>Add</a>
-          </Link>
-        </Button>
-      </div>
+      <SuspenseLoader loading={loading} className={styles.buttons}>
+        <Space className={styles.buttons}>
+          <GuardedLink href='/projects/new' gate={PERMISSION.ADD_PROJECTS} hideIfFailed>
+            <Button type='primary'>
+              Add
+            </Button>
+          </GuardedLink>
+        </Space>
+      </SuspenseLoader>
       <Table
         loading={loading}
         dataSource={projects}

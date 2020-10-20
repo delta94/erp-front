@@ -2,47 +2,31 @@ import { success, error } from '@redux-requests/core';
 
 import { FETCH_TAGS, FETCH_TAG, ADD_TAG } from './types';
 import {
-  mapError, mapPaginationResponse, mapSingleEntityResponse, mapAdditionResponse,
+  mapError, mapPaginationResponse, mapSingleEntityResponse, mapAdditionResponse, mutateState,
 } from '../mutations';
-
-const singleEntity = {
-  data: {},
-  loading: true,
-  response: {
-    forbidden: false,
-    found: false,
-  },
-};
+import { ENTITY_STATE_STANDARD, SINGLE_ENTITY_STATE_STANDARD } from '../../utils/constants';
 
 const initialState = {
-  total: 0,
-  data: [],
-  filters: {},
-  loading: false,
-
-  item: { ...singleEntity },
+  ...ENTITY_STATE_STANDARD,
+  item: { ...SINGLE_ENTITY_STATE_STANDARD },
 };
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_TAGS:
-      return { ...state, loading: true };
-
+      return mutateState(state, action, { loading: true });
     case FETCH_TAG:
-      return { ...state, item: { ...state.item, loading: true } };
+      return mutateState(state, action, { loading: true }, 'item');
 
     case success(FETCH_TAGS):
       return mapPaginationResponse(state, action);
-
     case success(FETCH_TAG):
       return mapSingleEntityResponse(state, action);
-
     case success(ADD_TAG):
       return mapAdditionResponse(state, action);
 
     case error(FETCH_TAGS):
-      return { ...state, loading: false };
-
+      return mapError(state, action);
     case error(FETCH_TAG):
       return mapError(state, action, 'item');
 

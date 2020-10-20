@@ -34,7 +34,7 @@ export const addClient = ({ photos, ...data }) => {
   };
 };
 
-export const editClient = (id, { photos, ...data }) => {
+export const editClient = (id, { photos = [], ...data }) => {
   const payload = { ...data };
   payload.photos = photos.map((photo) => photo.response?.id || photo.id).filter((photo) => !!photo);
 

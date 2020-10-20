@@ -1,14 +1,13 @@
 import {
   useCallback, useState, useEffect, useRef, useMemo,
 } from 'react';
-import {
-  Card, message, PageHeader, Result,
-} from 'antd';
+import { Card, message, PageHeader } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import styles from './Users.module.scss';
 import UserForm from './components/UserForm';
+import EntityAccessMiddleware from '../common/EntityAccessMiddleware';
 import { parseErrors } from '../../utils';
 import { RESPONSE_MODE } from '../../utils/constants';
 import { editUser, fetchUser } from '../../store/users/actions';
@@ -19,7 +18,7 @@ const EditUser = () => {
   const { back, query } = useRouter();
   const form = useRef(null);
   const [submitting, setSubmitting] = useState(false);
-  const [user, loading, isFound] = useSelector(userSelector);
+  const [user, loading, response] = useSelector(userSelector);
 
   const handleSubmit = useCallback(async () => {
     try {
@@ -48,7 +47,7 @@ const EditUser = () => {
       uid: idx,
       name: item.url.substring(item.url.lastIndexOf('/') + 1),
     })),
-  }) : ({})), [user]);
+  }) : null), [user]);
 
   useEffect(() => {
     if (query.id) dispatch(fetchUser(query.id, { mode: RESPONSE_MODE.ORIGINAL }));
@@ -59,22 +58,19 @@ const EditUser = () => {
       <PageHeader
         className={styles.pageHeader}
         title='Edit User'
+        subTitle={user.name}
         onBack={back}
       />
-      {
-        !isFound && !loading
-          ? <Result status='404' title='Not Found' subTitle='Sorry, such user does not exist.' />
-          : (
-            <Card className={styles.container}>
-              <UserForm
-                onSubmit={handleSubmit}
-                submitting={submitting}
-                initialValues={initialValues}
-                formRef={form}
-              />
-            </Card>
-          )
-      }
+      <EntityAccessMiddleware entityName='user' response={response} loading={loading}>
+        <Card className={styles.container}>
+          <UserForm
+            onSubmit={handleSubmit}
+            submitting={submitting}
+            initialValues={initialValues}
+            formRef={form}
+          />
+        </Card>
+      </EntityAccessMiddleware>
     </>
   );
 };

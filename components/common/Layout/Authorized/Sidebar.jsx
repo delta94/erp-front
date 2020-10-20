@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Layout as AntLayout, Menu } from 'antd';
 import {
   MailOutlined, DeploymentUnitOutlined, UnorderedListOutlined, TeamOutlined, SolutionOutlined, DollarCircleOutlined,
-  BankOutlined, WalletOutlined, ContactsOutlined,
+  BankOutlined, WalletOutlined, ContactsOutlined, HourglassOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 
@@ -38,10 +38,15 @@ const LINKS = {
       { title: 'Expenses', route: '/expenses', icon: WalletOutlined },
     ],
   },
+  WORKTIME: {
+    title: 'Worktime',
+    icon: HourglassOutlined,
+    route: '/worktime',
+  },
 };
 
 const LINKS_MAP = {
-  [USER_ROLE.ADMIN]: [LINKS.USERS, LINKS.ACCOUNTS, LINKS.PROJECTS, LINKS.CLIENTS, LINKS.BUDGET],
+  [USER_ROLE.ADMIN]: [LINKS.USERS, LINKS.ACCOUNTS, LINKS.PROJECTS, LINKS.WORKTIME, LINKS.CLIENTS, LINKS.BUDGET],
   [USER_ROLE.MANAGER]: [LINKS.USERS_LIST, LINKS.ACCOUNTS, LINKS.PROJECTS, LINKS.CLIENTS],
 };
 
@@ -63,7 +68,7 @@ const Sidebar = ({ collapsed }) => {
       };
       let arr = [];
       if (user?.roles?.includes(USER_ROLE.ADMIN)) arr = LINKS_MAP[USER_ROLE.ADMIN];
-      else if (user?.roles?.includes(USER_ROLE.ADMIN)) arr = LINKS_MAP[USER_ROLE.MANAGER];
+      else if (user?.roles?.includes(USER_ROLE.MANAGER)) arr = LINKS_MAP[USER_ROLE.MANAGER];
       for (let i = 0; i < arr.length; i += 1) {
         if (rec(arr[i])) {
           return [tree.slice(0, tree.length - 1).join('-'), tree.join('-')];

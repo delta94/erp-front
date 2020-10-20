@@ -74,8 +74,8 @@ Can.propTypes = {
     any: PropTypes.arrayOf(PropTypes.string),
     except: PropTypes.arrayOf(PropTypes.string),
   })]).isRequired,
-  yes: PropTypes.oneOfType([PropTypes.element, PropTypes.oneOf([null])]).isRequired,
-  no: PropTypes.oneOfType([PropTypes.element, PropTypes.oneOf([null]), PropTypes.string]),
+  yes: PropTypes.any.isRequired,
+  no: PropTypes.any,
   loading: PropTypes.element,
 };
 

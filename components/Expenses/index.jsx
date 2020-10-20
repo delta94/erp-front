@@ -1,13 +1,17 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { Badge, Button, Table } from 'antd';
+import {
+  Badge, Button, Space, Table,
+} from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
 import styles from './Expenses.module.scss';
 import usePagination from '../../utils/hooks/usePagination';
-import { CURRENCY_SYMBOLS, PAYMENT_STATUS_COLORS } from '../../utils/constants';
+import { CURRENCY_SYMBOLS, PAYMENT_STATUS_COLORS, PERMISSION } from '../../utils/constants';
 import { fetchExpenses } from '../../store/expenses/actions';
 import { expensesSelector } from '../../store/expenses/selectors';
+import GuardedLink from '../common/GuardedLink';
+import SuspenseLoader from '../common/SuspenseLoader';
 
 const COLUMNS = [
   {
@@ -41,14 +45,15 @@ const Expenses = () => {
 
   return (
     <>
-      <div className={styles.buttons}>
-        <Button type='primary'>
-          <Link href='/expenses/new'>
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-            <a>Add</a>
-          </Link>
-        </Button>
-      </div>
+      <SuspenseLoader loading={loading} className={styles.buttons}>
+        <Space className={styles.buttons}>
+          <GuardedLink href='/expenses/new' gate={PERMISSION.ADD_EXPENSES} hideIfFailed>
+            <Button type='primary'>
+              Add
+            </Button>
+          </GuardedLink>
+        </Space>
+      </SuspenseLoader>
       <Table
         columns={COLUMNS}
         loading={loading}

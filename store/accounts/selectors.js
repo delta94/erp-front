@@ -1,12 +1,9 @@
-export const accountsSelector = (state) => [
-  state.accounts.data,
-  state.accounts.total,
-  state.accounts.loading,
-  state.accounts.filters,
-];
+import { entitySelector, singleEntitySelector } from '../selectors';
 
-export const accountSelector = (state) => [
-  state.accounts.item.data,
-  state.accounts.item.loading,
-  state.accounts.item.response,
-];
+const ENTITY = 'accounts';
+
+export const accountsSelector = (state) => entitySelector(ENTITY)(state);
+
+export const accountSelector = (state) => singleEntitySelector(ENTITY)(state);
+
+export const accountCategoriesSelector = (state) => entitySelector(ENTITY, 'categories')(state);

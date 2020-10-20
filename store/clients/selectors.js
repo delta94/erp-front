@@ -1,22 +1,11 @@
-export const clientsSelector = (state) => [
-  state.clients.data,
-  state.clients.total,
-  state.clients.loading,
-  state.clients.filters,
-];
+import { entitySelector, singleEntitySelector } from '../selectors';
 
-export const clientFieldTypesSelector = (state) => [
-  state.clients.fieldTypes.data,
-  state.clients.fieldTypes.loading,
-];
+const ENTITY = 'clients';
 
-export const clientOriginsSelector = (state) => [
-  state.clients.origins.data,
-  state.clients.origins.loading,
-];
+export const clientsSelector = (state) => entitySelector(ENTITY)(state);
 
-export const clientSelector = (state) => [
-  state.clients.client,
-  state.clients.clientLoading,
-  state.clients.found,
-];
+export const clientFieldTypesSelector = (state) => entitySelector(ENTITY, 'fieldTypes')(state);
+
+export const clientOriginsSelector = (state) => entitySelector(ENTITY, 'origins')(state);
+
+export const clientSelector = (state) => singleEntitySelector(ENTITY)(state);

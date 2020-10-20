@@ -73,6 +73,25 @@ export function parseErrors(errors, replaceMessageWith = null, values = null) {
 }
 
 /**
+ * @param {Object} obj
+ * @param {String} prefix
+ */
+export function parseObject(obj, prefix = '') {
+  const keys = Object.keys(obj);
+  const fields = [];
+  for (let i = 0; i < keys.length; i += 1) {
+    const namePath = keys[i].split('.').map((part) => (Number.isNaN(+part) ? part : +part));
+    fields.push({
+      // eslint-disable-next-line no-nested-ternary
+      name: prefix ? [prefix, ...namePath] : (namePath.length === 1 ? namePath[0] : namePath),
+      value: obj[keys[i]],
+      checked: true,
+    });
+  }
+  return fields;
+}
+
+/**
  * @param {String} str
  */
 export function ucFirst(str) {
@@ -221,7 +240,11 @@ export function prefixedName(prefix, name) {
 }
 
 export function decryptPassword(password, hexIv) {
-  const key = crypto.PBKDF2(KEY, SALT, { hasher: crypto.algo.SHA512, keySize: 64 / 8, iterations: 256 });
-  const iv = crypto.enc.Hex.parse(hexIv);
-  return crypto.AES.decrypt(password, key, { iv, mode: crypto.mode.CBC }).toString(crypto.enc.Utf8);
+  try {
+    const key = crypto.PBKDF2(KEY, SALT, { hasher: crypto.algo.SHA512, keySize: 64 / 8, iterations: 256 });
+    const iv = crypto.enc.Hex.parse(hexIv);
+    return crypto.AES.decrypt(password, key, { iv, mode: crypto.mode.CBC }).toString(crypto.enc.Utf8);
+  } catch (e) {
+    return 'Decrypt failed';
+  }
 }

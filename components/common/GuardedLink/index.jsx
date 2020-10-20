@@ -1,21 +1,25 @@
 import Link from 'next/link';
 import PropTypes from 'prop-types';
+import { Spin } from 'antd';
 
 import Can from '../Can';
 
 const GuardedLink = ({
-  href, as, label, gate, children, hideIfFailed,
+  href, as, label, gate, children, hideIfFailed, loading,
 }) => (
-  <Can
-    perform={gate}
-    yes={(
-      <Link href={href} as={as}>
-        { /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
-        <a>{label || children}</a>
-      </Link>
+  loading ? <Spin size='small' style={{ marginTop: '5px' }} />
+    : (
+      <Can
+        perform={gate}
+        yes={(
+          <Link href={href} as={as}>
+            { /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
+            <a>{label || children}</a>
+          </Link>
     )}
-    no={hideIfFailed ? null : (label || children)}
-  />
+        no={hideIfFailed ? null : (label || children)}
+      />
+    )
 );
 
 GuardedLink.propTypes = {
@@ -29,6 +33,7 @@ GuardedLink.propTypes = {
   as: PropTypes.string,
   children: PropTypes.any,
   hideIfFailed: PropTypes.bool,
+  loading: PropTypes.bool,
 };
 
 GuardedLink.defaultProps = {
@@ -36,6 +41,7 @@ GuardedLink.defaultProps = {
   children: null,
   label: '',
   hideIfFailed: false,
+  loading: false,
 };
 
 export default GuardedLink;

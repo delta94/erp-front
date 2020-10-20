@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 
 import styles from './Projects.module.scss';
 import usePagination from '../../../../utils/hooks/usePagination';
+import EntityAccessMiddleware from '../../../common/EntityAccessMiddleware';
 import { ORIGIN_COLORS, PAYMENT_STATUS_COLORS, RESPONSE_MODE } from '../../../../utils/constants';
 import { clearUserSubState, fetchUserPayments } from '../../../../store/users/actions';
 import { userPaymentsSelector } from '../../../../store/users/selectors';
@@ -45,7 +46,7 @@ const COLUMNS = [
 const UserPayments = () => {
   const dispatch = useDispatch();
   const { query } = useRouter();
-  const [payments, total, loading] = useSelector(userPaymentsSelector);
+  const [payments, total, loading, , response] = useSelector(userPaymentsSelector);
   const [pagination, paginationOptions] = usePagination();
 
   useEffect(() => {
@@ -54,20 +55,22 @@ const UserPayments = () => {
   }, [dispatch, query, pagination]);
 
   return (
-    <Table
-      size='small'
-      loading={loading}
-      dataSource={payments}
-      columns={COLUMNS}
-      scroll={{ x: 600 }}
-      className={styles.table}
-      showHeader={!!payments.length}
-      pagination={{
-        total,
-        size: 'small',
-        ...paginationOptions,
-      }}
-    />
+    <EntityAccessMiddleware entityName='payments' loading={loading} response={response} mode='simple'>
+      <Table
+        size='small'
+        loading={loading}
+        dataSource={payments}
+        columns={COLUMNS}
+        scroll={{ x: 600 }}
+        className={styles.table}
+        showHeader={!!payments.length}
+        pagination={{
+          total,
+          size: 'small',
+          ...paginationOptions,
+        }}
+      />
+    </EntityAccessMiddleware>
   );
 };
 

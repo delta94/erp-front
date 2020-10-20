@@ -1,32 +1,20 @@
 import { createSelector } from 'reselect';
 
-export const projectsSelector = (state) => [
-  state.projects.data,
-  state.projects.total,
-  state.projects.loading,
-  state.projects.filters,
-];
+import { entitySelector, singleEntitySelector } from '../selectors';
 
-export const projectStatusesSelector = (state) => [
-  state.projects.statuses.data,
-  state.projects.statuses.total,
-  state.projects.statuses.loading,
-  state.projects.statuses.filters,
-];
+const ENTITY = 'projects';
 
-export const projectAccountsSelector = (state) => [
-  state.projects.accounts.data,
-  state.projects.accounts.total,
-  state.projects.accounts.loading,
-  state.projects.accounts.filters,
-];
+export const projectsSelector = (state) => entitySelector(ENTITY)(state);
 
-export const projectWorktimeSelector = (state) => [
-  state.projects.worktime.data,
-  state.projects.worktime.total,
-  state.projects.worktime.loading,
-  state.projects.worktime.filters,
-];
+export const projectStatusesSelector = (state) => entitySelector(ENTITY, 'statuses')(state);
+
+export const projectAccountsSelector = (state) => entitySelector(ENTITY, 'accounts')(state);
+
+export const projectWorktimeSelector = (state) => entitySelector(ENTITY, 'worktime')(state);
+
+export const projectUsersSelector = (state) => entitySelector(ENTITY, 'users')(state);
+
+export const projectSelector = (state) => singleEntitySelector(ENTITY)(state);
 
 export const projectTotals = (state) => [
   createSelector(
