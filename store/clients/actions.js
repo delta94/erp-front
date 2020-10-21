@@ -1,5 +1,13 @@
 import {
-  ADD_CLIENT, EDIT_CLIENT, FETCH_CLIENT, FETCH_CLIENT_FIELD_TYPES, FETCH_CLIENT_ORIGINS, FETCH_CLIENTS,
+  ADD_CLIENT,
+  CLEAR_CLIENTS,
+  CLEAR_CLIENTS_SUB_STATE,
+  EDIT_CLIENT,
+  FETCH_CLIENT,
+  FETCH_CLIENT_FIELD_TYPES,
+  FETCH_CLIENT_ORIGINS, FETCH_CLIENT_PAYMENTS,
+  FETCH_CLIENT_PROJECTS,
+  FETCH_CLIENTS,
 } from './types';
 import { composeQuery } from '../../utils';
 
@@ -57,6 +65,42 @@ export const fetchClientOrigins = () => ({
   meta: { subState: 'origins' },
 });
 
+/**
+ * @param {Number} id
+ * @param {PaginationQuery} query
+ * @param {Object=} meta
+ */
+export const fetchClientProjects = (id, query = { page: 1, size: 10 }, meta) => {
+  const params = composeQuery(query);
+  return {
+    type: FETCH_CLIENT_PROJECTS,
+    request: {
+      method: 'GET',
+      url: `/clients/${id}/projects`,
+      params,
+    },
+    meta: { ...meta, subState: 'projects' },
+  };
+};
+
+/**
+ * @param {Number} id
+ * @param {PaginationQuery} query
+ * @param {Object=} meta
+ */
+export const fetchClientPayments = (id, query = { page: 1, size: 10 }, meta) => {
+  const params = composeQuery(query);
+  return {
+    type: FETCH_CLIENT_PAYMENTS,
+    request: {
+      method: 'GET',
+      url: `/clients/${id}/payments`,
+      params,
+    },
+    meta: { ...meta, subState: 'payments' },
+  };
+};
+
 export const fetchClientFieldTypes = () => ({
   type: FETCH_CLIENT_FIELD_TYPES,
   request: {
@@ -73,4 +117,13 @@ export const fetchClient = (id, params) => ({
     url: `/clients/${id}`,
     params,
   },
+});
+
+export const clearClients = () => ({
+  type: CLEAR_CLIENTS,
+});
+
+export const clearClientsSubState = (name) => ({
+  type: CLEAR_CLIENTS_SUB_STATE,
+  meta: { subState: name },
 });

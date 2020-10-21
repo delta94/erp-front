@@ -9,7 +9,6 @@ import {
 } from '@ant-design/icons';
 
 import styles from '../Clients.module.scss';
-import SimplifiedProjectsList from '../../common/SimplifiedProjectsList';
 import Can from '../../common/Can';
 import About from './About';
 import { fetchClient } from '../../../store/clients/actions';
@@ -17,6 +16,8 @@ import { clientSelector } from '../../../store/clients/selectors';
 import { ORIGIN_COLORS, PERMISSION } from '../../../utils/constants';
 import { wildcard } from '../../../utils';
 import GuardedLink from '../../common/GuardedLink';
+import ClientProjects from './Projects';
+import ClientPayments from './Payments';
 
 const CARD_STYLE = {
   headStyle: {
@@ -34,13 +35,12 @@ const TABS = [
   {
     title: 'Projects',
     icon: ProjectOutlined,
-    // eslint-disable-next-line react/prop-types
-    component: ({ client }) => <SimplifiedProjectsList data={client.projects || []} />,
+    component: ClientProjects,
   },
   {
-    title: 'Invoices',
+    title: 'Payments',
     icon: ScheduleOutlined,
-    component: () => 'tab 2',
+    component: ClientPayments,
   },
 ];
 
@@ -80,9 +80,9 @@ const ClientProfile = () => {
         </span>
       )}
     >
-      <tab.component client={client} />
+      <tab.component />
     </Tabs.TabPane>
-  ), [client]);
+  ), []);
 
   const content = useMemo(() => (
     <Row gutter={[16, 16]}>
@@ -124,11 +124,11 @@ const ClientProfile = () => {
                     ? <Empty description={false} />
                     : client.links.map((link, idx) => (
                       <Typography.Link
-                        key={idx.toString()}
-                        href={`https://${link.value}`}
-                        className={styles.description}
-                        target='_blank'
-                        rel='noopener noreferrer'
+                          key={idx.toString()}
+                          href={`https://${link.value}`}
+                          className={styles.description}
+                          target='_blank'
+                          rel='noopener noreferrer'
                       >
                         { getIconForLink(link.type) }
                         { link.value }

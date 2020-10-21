@@ -1,12 +1,13 @@
 import {
   ADD_ACCOUNT,
   CLEAR_ACCOUNTS,
+  CLEAR_ACCOUNTS_SUB_STATE,
   DELETE_ACCOUNT,
   EDIT_ACCOUNT,
   FETCH_ACCOUNT,
-  FETCH_ACCOUNT_CATEGORIES,
-  FETCH_ACCOUNT_PROJECT_DETAILS,
-  FETCH_ACCOUNTS, FETCH_LAST_ACCOUNT_PAYMENT,
+  FETCH_ACCOUNT_CATEGORIES, FETCH_ACCOUNT_PAYMENTS,
+  FETCH_ACCOUNT_PROJECT_DETAILS, FETCH_ACCOUNT_PROJECTS,
+  FETCH_ACCOUNTS,
 } from './types';
 import { composeQuery } from '../../utils';
 
@@ -50,13 +51,31 @@ export const fetchAccountProjectDetails = (accountId, projectId) => ({
 export const fetchAccountPayments = (accountId, query = { page: 1, size: 10 }, meta) => {
   const params = composeQuery(query);
   return {
-    type: FETCH_LAST_ACCOUNT_PAYMENT,
+    type: FETCH_ACCOUNT_PAYMENTS,
     request: {
       method: 'GET',
       url: `/accounts/${accountId}/payments`,
       params,
     },
     meta,
+  };
+};
+
+/**
+ * @param {Number} accountId
+ * @param {PaginationQuery} query
+ * @param {Object=} meta
+ */
+export const fetchAccountProjects = (accountId, query = { page: 1, size: 10 }, meta) => {
+  const params = composeQuery(query);
+  return {
+    type: FETCH_ACCOUNT_PROJECTS,
+    request: {
+      method: 'GET',
+      url: `/accounts/${accountId}/projects`,
+      params,
+    },
+    meta: { ...meta, subState: 'projects' },
   };
 };
 
@@ -97,4 +116,9 @@ export const deleteAccount = (id) => ({
 
 export const clearAccounts = () => ({
   type: CLEAR_ACCOUNTS,
+});
+
+export const clearAccountsSubState = (name) => ({
+  type: CLEAR_ACCOUNTS_SUB_STATE,
+  meta: { subState: name },
 });
