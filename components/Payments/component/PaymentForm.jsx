@@ -115,6 +115,15 @@ const PaymentForm = ({
     }
   }, [dispatch, form, project, details]);
 
+  const handleRateFill = useCallback((name) => {
+    if (details) {
+      const rate = details.salary_based
+        ? (details.rate / HOURS_CAP).toFixed(2)
+        : details.rate;
+      form.setFields([{ name: ['items', ...name], value: rate }]);
+    }
+  }, [form, details]);
+
   const renderItemField = useCallback((fields, { remove }) => fields.map((field, idx) => (
     <Row gutter={10} key={idx.toString()} className={styles.relative}>
       <Col span={8}>
@@ -148,7 +157,7 @@ const PaymentForm = ({
           />
         </Form.Item>
       </Col>
-      <Col span={3}>
+      <Col span={3} className={styles.relative}>
         <Form.Item
           label='Rate'
           name={[idx, 'rate']}
@@ -165,6 +174,14 @@ const PaymentForm = ({
             loading={accountsLoading}
           />
         </Form.Item>
+        <Button
+          type='link'
+          className={classNames(styles.topRight, styles.noPadding)}
+          disabled={!val.project || !val.account || !details}
+          onClick={() => handleRateFill([idx, 'rate'])}
+        >
+          Fill
+        </Button>
       </Col>
       <Col span={10}>
         <Form.Item
@@ -193,17 +210,7 @@ const PaymentForm = ({
         )
       }
     </Row>
-  )), [val, accountsLoading, handleRangeChange]);
-
-  const handleItemsChange = useCallback(() => {
-    const data = form.getFieldsValue(['items']);
-    if (details) {
-      const rate = details.salary_based
-        ? (details.rate / HOURS_CAP).toFixed(2)
-        : details.rate;
-      form.setFields(data.items.map((item, idx) => ({ name: ['items', idx, 'rate'], value: rate })));
-    }
-  }, [form, details]);
+  )), [val, accountsLoading, handleRangeChange, handleRateFill, details]);
 
   const handleFormChange = useCallback(async (event, values) => {
     if (event.project) {
@@ -218,11 +225,8 @@ const PaymentForm = ({
       dispatch(fetchAccountProjectDetails(event.account, values.project, { silent: true }))
         .then(({ data }) => { if (data) setDetails(data); });
     }
-    if (event.items) {
-      handleItemsChange();
-    }
     setValues(form.getFieldsValue());
-  }, [dispatch, form, handleItemsChange]);
+  }, [dispatch, form]);
 
   const handleRouteChange = useCallback(() => dispatch(clearProjects()), [dispatch]);
 
@@ -279,6 +283,23 @@ const PaymentForm = ({
   }, [dispatch, form, project, account]);
 
   useEffect(() => {
+    if (details) {
+      const values = form.getFieldsValue();
+      if (values.items) {
+        const rate = details.salary_based
+          ? (details.rate / HOURS_CAP).toFixed(2)
+          : details.rate;
+        form.setFields(values.items?.map((item, idx) => {
+          const r = (details.account_id === initialValues?.account)
+            ? initialValues?.items?.[idx]?.rate
+            : rate;
+          return { name: ['items', idx, 'rate'], value: r };
+        }));
+      }
+    }
+  }, [form, details, initialValues]);
+
+  useEffect(() => {
     dispatch(fetchPaymentStatuses());
     dispatch(fetchProjects({
       mode: RESPONSE_MODE.MINIMAL,
@@ -290,13 +311,15 @@ const PaymentForm = ({
   }, [dispatch, events, handleRouteChange]);
 
   useEffect(() => {
-    handleItemsChange();
-  }, [handleItemsChange]);
-
-  useEffect(() => {
+    if (initialValues?.project) {
+      handleFormChange({ project: initialValues.project });
+    }
+    if (initialValues?.project && initialValues?.account) {
+      handleFormChange({ account: initialValues.account }, { project: initialValues.project });
+    }
     form.resetFields();
     setValues(initialValues);
-  }, [form, initialValues]);
+  }, [form, initialValues, handleFormChange]);
 
   useEffect(() => {
     // eslint-disable-next-line no-param-reassign
@@ -371,7 +394,7 @@ const PaymentForm = ({
             </Form.Item>
           </Col>
         </Row>
-        <Form.List label='Items' name='items' onChange={handleItemsChange}>
+        <Form.List label='Items' name='items'>
           {
             (...args) => (
               <>
@@ -499,7 +522,7 @@ const PaymentForm = ({
             </Form.Item>
           </Col>
           {
-            val.options?.tax && (
+            val.options?.tax && optionsShown && (
               <>
                 <Col span={8}>
                   <Form.Item

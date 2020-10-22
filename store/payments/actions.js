@@ -1,5 +1,12 @@
 import {
-  ADD_PAYMENT, FETCH_PAYMENT_STATUSES, FETCH_PAYMENTS, CLEAR_PAYMENTS, GENERATE_INVOICE, DELETE_PAYMENT,
+  ADD_PAYMENT,
+  FETCH_PAYMENT_STATUSES,
+  FETCH_PAYMENTS,
+  CLEAR_PAYMENTS,
+  GENERATE_INVOICE,
+  DELETE_PAYMENT,
+  FETCH_PAYMENT,
+  EDIT_PAYMENT,
 } from './types';
 
 import { composeQuery } from '../../utils';
@@ -19,6 +26,15 @@ export const fetchPayments = (query = { page: 1, size: 10 }) => {
   };
 };
 
+export const fetchPayment = (id, params) => ({
+  type: FETCH_PAYMENT,
+  request: {
+    method: 'GET',
+    url: `/payments/${id}`,
+    params,
+  },
+});
+
 export const fetchPaymentStatuses = () => ({
   type: FETCH_PAYMENT_STATUSES,
   request: {
@@ -37,6 +53,20 @@ export const addPayment = (data) => {
     request: {
       method: 'POST',
       url: '/payments',
+      data: payload,
+    },
+  };
+};
+
+export const editPayment = (id, data) => {
+  const payload = { ...data };
+  if (payload.options?.due_date) payload.options.due_date = payload.options.due_date.format('YYYY-MM-DD');
+  if (payload.options?.date) payload.options.date = payload.options.date.format('YYYY-MM-DD');
+  return {
+    type: EDIT_PAYMENT,
+    request: {
+      method: 'PATCH',
+      url: `/payments/${id}`,
       data: payload,
     },
   };
