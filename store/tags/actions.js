@@ -6,8 +6,9 @@ import { composeQuery } from '../../utils';
 
 /**
  * @param {PaginationQuery} query
+ * @param {Object=} meta
  */
-export const fetchTags = (query = { page: 1, size: 10 }) => {
+export const fetchTags = (query = { page: 1, size: 10 }, meta = {}) => {
   const params = composeQuery(query);
   return {
     type: FETCH_TAGS,
@@ -16,6 +17,7 @@ export const fetchTags = (query = { page: 1, size: 10 }) => {
       url: '/tags',
       params,
     },
+    meta,
   };
 };
 

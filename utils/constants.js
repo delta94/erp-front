@@ -1,5 +1,7 @@
 import moment from 'moment';
-import { UserOutlined, ContactsOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
+import {
+  UserOutlined, ContactsOutlined, DeploymentUnitOutlined, HourglassOutlined,
+} from '@ant-design/icons';
 
 export const RESPONSE_OBJECT_STANDARD = {
   forbidden: false,
@@ -450,6 +452,27 @@ export const ACCOUNT_CATEGORY_COLOR = {
   [ACCOUNT_CATEGORY.PROJECT]: 'cyan',
 };
 
+export const RAISE_TYPE = {
+  PERSONAL: 'personal',
+  WEEKLY_LIMIT: 'weekly limit',
+  PROJECT: 'project',
+};
+
+export const RAISE_TYPE_DISPLAY = {
+  [RAISE_TYPE.PERSONAL]: {
+    color: 'green',
+    icon: UserOutlined,
+  },
+  [RAISE_TYPE.PROJECT]: {
+    color: 'blue',
+    icon: DeploymentUnitOutlined,
+  },
+  [RAISE_TYPE.WEEKLY_LIMIT]: {
+    color: 'orange',
+    icon: HourglassOutlined,
+  },
+};
+
 export const WORKDAYS = (() => {
   const workingWeekdays = [1, 2, 3, 4, 5];
   let currentDay = moment().startOf('month');
@@ -521,9 +544,11 @@ export const PERMISSION = {
   EDIT_PROJECTS: 'projects.update',
   EDIT_PAYMENTS: 'payments.update',
   EDIT_EXPENSES: 'expenses.update',
+  EDIT_RAISES: 'raises.update',
 
   DELETE_ACCOUNTS: 'accounts.delete',
   DELETE_PAYMENTS: 'payments.delete',
+  DELETE_RAISES: 'raises.delete',
 };
 
 export const PROGRESS_CARD_STYLE = {

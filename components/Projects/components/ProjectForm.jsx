@@ -1,5 +1,5 @@
 import {
-  useCallback, useState, useRef, useEffect, useMemo,
+  useCallback, useRef, useEffect, useMemo,
 } from 'react';
 import {
   Form, Input, Button, Col, Row, Select, Upload, Switch, Badge, DatePicker, Tag, Divider,
@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 
 import styles from '../Projects.module.scss';
 import usePhotos from '../../../utils/hooks/usePhoto';
+import useTags from '../../../utils/hooks/useTags';
 import {
   URLS, BASE_URL, STATUS_COLORS, RESPONSE_MODE, USER_ROLE, ORIGIN_COLORS, ACCOUNT_TYPE,
 } from '../../../utils/constants';
@@ -38,6 +39,9 @@ const ProjectForm = ({
   const [clients, , clientsLoading] = useSelector(clientsSelector);
   const [users, , usersLoading] = useSelector(usersSelector);
   const [accounts, , accountsLoading] = useSelector(accountsSelector);
+  const [tagsComponent] = useTags('technology', 'Stack');
+
+  const handleRouteChange = useCallback(() => dispatch(clearAccounts()), [dispatch]);
 
   const statusOptions = useMemo(() => statuses.map((s, idx) => (
     <Select.Option key={idx.toString()} value={s}>
@@ -189,8 +193,6 @@ const ProjectForm = ({
     </Row>
   )), []);
 
-  const handleRouteChange = useCallback(() => dispatch(clearAccounts()), [dispatch]);
-
   useEffect(() => {
     dispatch(fetchProjectStatuses());
     dispatch(fetchClients({ mode: RESPONSE_MODE.MINIMAL }));
@@ -227,7 +229,7 @@ const ProjectForm = ({
       {...props}
     >
       <Row gutter={10}>
-        <Col span={24}>
+        <Col span={12}>
           <Form.Item
             label='Project Title'
             name='title'
@@ -237,6 +239,15 @@ const ProjectForm = ({
             ]}
           >
             <Input placeholder="Project's title" />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            label='Tech stack'
+            name='tags'
+            className={styles.labelAlign}
+          >
+            { tagsComponent }
           </Form.Item>
         </Col>
         <Col span={12}>

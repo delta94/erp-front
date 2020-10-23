@@ -1,23 +1,36 @@
 import { useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Badge, Empty, Table } from 'antd';
+import { Badge, Table, Tag } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
-import { MinusOutlined } from '@ant-design/icons';
+import { MinusOutlined, QuestionOutlined } from '@ant-design/icons';
 
 import styles from './Raises.module.scss';
 import usePagination from '../../../../utils/hooks/usePagination';
-import { RESPONSE_MODE, STATUS_COLORS, USER_ROLE } from '../../../../utils/constants';
+import EntityAccessMiddleware from '../../../common/EntityAccessMiddleware';
 import { clearUserSubState, fetchUserRaises } from '../../../../store/users/actions';
 import { userRaisesSelector } from '../../../../store/users/selectors';
 import { formatCurrency } from '../../../../utils';
 import { signedUserSelector } from '../../../../store/auth/selectors';
-import EntityAccessMiddleware from '../../../common/EntityAccessMiddleware';
+import {
+  RAISE_TYPE_DISPLAY, RESPONSE_MODE, STATUS_COLORS, USER_ROLE,
+} from '../../../../utils/constants';
 
 const COLUMNS = {
   TYPE: {
     title: 'Type',
     dataIndex: 'type',
+    render: (type) => {
+      const display = RAISE_TYPE_DISPLAY[type];
+      const Icon = display.icon || QuestionOutlined;
+      return (
+        <Tag color={display.color || 'default'}>
+          <Icon />
+          &nbsp;
+          {type}
+        </Tag>
+      );
+    },
   },
   AMOUNT: {
     title: 'Amount',
@@ -50,11 +63,16 @@ const MAP = {
 const UserRaises = () => {
   const dispatch = useDispatch();
   const { query } = useRouter();
-  const [projects, total, loading, , response] = useSelector(userRaisesSelector);
+  const [records, total, loading, , response] = useSelector(userRaisesSelector);
   const [pagination, paginationOptions] = usePagination();
-  const [user] = useSelector(signedUserSelector);
+  const [signedUser] = useSelector(signedUserSelector);
 
-  const columns = useMemo(() => MAP[user?.role], [user]);
+  const columns = useMemo(() => {
+    for (let i = 0; i < signedUser?.roles?.length; i += 1) {
+      if (MAP[signedUser.roles[i]]) return MAP[signedUser.roles[i]];
+    }
+    return [];
+  }, [signedUser]);
 
   useEffect(() => {
     if (query.id) {
@@ -71,11 +89,11 @@ const UserRaises = () => {
       <Table
         size='small'
         loading={loading}
-        dataSource={projects}
+        dataSource={records}
         columns={columns}
         scroll={{ x: 600 }}
         className={styles.table}
-        showHeader={!!projects.length}
+        showHeader={!!records.length}
         pagination={{
           total,
           size: 'small',

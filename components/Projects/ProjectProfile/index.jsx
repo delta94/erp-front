@@ -1,21 +1,16 @@
 import { useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import {
-  Avatar, Button, Card, Col, PageHeader, Row, Skeleton, Tabs, Tag, Typography,
+  Avatar, Button, Card, Col, Empty, PageHeader, Row, Skeleton, Tabs, Tag, Typography,
 } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  ClockCircleOutlined, DollarOutlined, TeamOutlined, ToTopOutlined,
-} from '@ant-design/icons';
+import { TeamOutlined } from '@ant-design/icons';
 
 import styles from '../Projects.module.scss';
 import GuardedLink from '../../common/GuardedLink';
 import EntityAccessMiddleware from '../../common/EntityAccessMiddleware';
 import Can from '../../common/Can';
 import SuspenseLoader from '../../common/SuspenseLoader';
-import ProjectPayments from './Payments';
-import ProjectRaises from './Raises';
-import ProjectWorktime from './Worktime';
 import ProjectTeam from './Team';
 import Profits from './Profits';
 import Time from './Time';
@@ -39,11 +34,6 @@ const Loader = ({ spanSize = 12 }) => (
 );
 
 const TABS = {
-  PAYMENTS: {
-    title: 'Payments',
-    icon: DollarOutlined,
-    component: ProjectPayments,
-  },
   USERS: {
     title: 'Team',
     icon: TeamOutlined,
@@ -154,6 +144,22 @@ const ProjectProfile = () => {
                         <Tag color={ORIGIN_COLORS[project.client?.origin] || 'cyan'}>{ project.client?.origin }</Tag>
                       </Typography.Text>
                     </div>
+                  </Skeleton>
+                </Card>
+              </Col>
+              <Col span={24}>
+                <Card
+                  className={styles.block}
+                  title='About'
+                  {...CARD_STYLE}
+                >
+                  <Skeleton loading={loading} active>
+                    { project.description ? (
+                      <Typography.Text className={styles.description} copyable>
+                        { project.description }
+                      </Typography.Text>
+                    ) : <Empty description={false} /> }
+
                   </Skeleton>
                 </Card>
               </Col>

@@ -28,10 +28,6 @@ const COLUMNS = [
     render: (item) => <Tag color={ORIGIN_COLORS[item.type]}>{ item.type }</Tag>,
   },
   {
-    title: 'Purpose',
-    dataIndex: 'purpose',
-  },
-  {
     title: 'Amount',
     dataIndex: 'amount',
     render: (amount) => formatCurrency(amount),

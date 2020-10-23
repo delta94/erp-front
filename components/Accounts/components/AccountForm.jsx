@@ -2,7 +2,7 @@ import {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 import {
-  Form, Row, Col, Input, Button, Select, Tag, Spin,
+  Form, Row, Col, Input, Button, Select, Tag,
 } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
@@ -10,18 +10,15 @@ import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 
 import styles from '../Accounts.module.scss';
+import useTags from '../../../utils/hooks/useTags';
 import { clearUsers, fetchUsers } from '../../../store/users/actions';
-import {
-  ACCOUNT_CATEGORY, ACCOUNT_CATEGORY_COLOR, RESPONSE_MODE,
-} from '../../../utils/constants';
 import { usersSelector } from '../../../store/users/selectors';
 import { mapOptions } from '../../../utils';
-import { tagsSelector } from '../../../store/tags/selectors';
-import { addTag, fetchTags } from '../../../store/tags/actions';
 import { accountCategoriesSelector } from '../../../store/accounts/selectors';
 import { clearAccounts, fetchAccountCategories } from '../../../store/accounts/actions';
 import { clearProjects, fetchProjectAccounts, fetchProjects } from '../../../store/projects/actions';
 import { projectAccountsSelector, projectsSelector } from '../../../store/projects/selectors';
+import { ACCOUNT_CATEGORY, ACCOUNT_CATEGORY_COLOR, RESPONSE_MODE } from '../../../utils/constants';
 
 const AccountForm = ({
   onSubmit, submitting, initialValues, formRef, ...props
@@ -34,7 +31,7 @@ const AccountForm = ({
   const [accounts, , accountsLoading] = useSelector(projectAccountsSelector);
   const [projects, , projectsLoading] = useSelector(projectsSelector);
   const [users, , usersLoading] = useSelector(usersSelector);
-  const [tags, , tagsLoading] = useSelector(tagsSelector);
+  const [tagsComponent] = useTags('account', 'Type', 1);
 
   const handleRouteChange = useCallback(() => {
     dispatch(clearUsers());
@@ -43,12 +40,6 @@ const AccountForm = ({
   }, [dispatch]);
 
   const ownerOptions = useMemo(() => mapOptions(users), [users]);
-
-  const tagRender = useCallback(({ label }) => (
-    <Tag color={label.props?.color || 'default'}>
-      { label.props?.children || label }
-    </Tag>
-  ), []);
 
   const projectOptions = useMemo(() => mapOptions(projects), [projects]);
 
@@ -66,35 +57,6 @@ const AccountForm = ({
       </Tag>
     </Select.Option>
   )), [categories]);
-
-  const tagOptions = useMemo(() => tags.map((tag, idx) => (
-    <Select.Option key={idx.toString()} value={tag.name} label={tag.name}>
-      <Tag color={tag.color || 'default'}>
-        {tag.name}
-      </Tag>
-    </Select.Option>
-  )), [tags]);
-
-  const handleTagsChange = useCallback(async (newTags) => {
-    for (let i = 0; i < newTags.length; i += 1) {
-      if (!tags.find((t) => t.name === newTags[i])) {
-        dispatch(
-          addTag({ name: newTags[i], category: 'account', color: 'default' }, { append: true }),
-        );
-      }
-    }
-  }, [dispatch, tags]);
-
-  const handleTagsSearch = useCallback((term) => {
-    if (term.length >= 3) {
-      dispatch(
-        fetchTags({
-          mode: RESPONSE_MODE.SIMPLIFIED,
-          filters: [{ name: 'category', value: 'account' }, { name: 'term', value: term }],
-        }),
-      );
-    }
-  }, [dispatch]);
 
   const renderAdditionalFields = useCallback((fields, { remove }) => fields.map((field, idx) => (
     <Row key={idx.toString()} gutter={16}>
@@ -142,7 +104,6 @@ const AccountForm = ({
   useEffect(() => {
     dispatch(fetchAccountCategories());
     dispatch(fetchUsers({ mode: RESPONSE_MODE.MINIMAL }));
-    dispatch(fetchTags({ mode: RESPONSE_MODE.SIMPLIFIED, filters: [{ name: 'category', value: ['account'] }] }));
     events.on('routeChangeStart', handleRouteChange);
     return () => events.off('routeChangeStart', handleRouteChange);
   }, [dispatch, events, handleRouteChange]);
@@ -214,19 +175,7 @@ const AccountForm = ({
               },
             })]}
           >
-            <Select
-              placeholder='Type'
-              mode='tags'
-              maxTagCount={1}
-              tagRender={tagRender}
-              loading={tagsLoading}
-              notFoundContent={tagsLoading ? <Spin size='small' /> : null}
-              onChange={handleTagsChange}
-              onSearch={handleTagsSearch}
-              showArrow
-            >
-              {tagOptions}
-            </Select>
+            { tagsComponent }
           </Form.Item>
         </Col>
         <Col span={12}>

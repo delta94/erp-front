@@ -56,6 +56,7 @@ const EditProject = () => {
       uid: idx,
       name: item.url.substring(item.url.lastIndexOf('/') + 1),
     })),
+    tags: project.tags?.map((t) => t.name),
   }) : ({})), [project]);
 
   useEffect(() => {

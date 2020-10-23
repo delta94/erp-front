@@ -17,6 +17,7 @@ import expenses from './expenses/reducer';
 import accounts from './accounts/reducer';
 import tags from './tags/reducer';
 import worktime from './worktime/reducer';
+import raises from './raises/reducer';
 import { BASE_URL } from '../utils/constants';
 
 const loggerMiddleware = createLogger();
@@ -49,6 +50,7 @@ const rootReducer = combineReducers({
   accounts,
   tags,
   worktime,
+  raises,
 });
 
 const middlewares = [

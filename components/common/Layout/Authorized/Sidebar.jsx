@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Layout as AntLayout, Menu } from 'antd';
 import {
   MailOutlined, DeploymentUnitOutlined, UnorderedListOutlined, TeamOutlined, SolutionOutlined, DollarCircleOutlined,
-  BankOutlined, WalletOutlined, ContactsOutlined, HourglassOutlined,
+  BankOutlined, WalletOutlined, ContactsOutlined, HourglassOutlined, ArrowUpOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 
@@ -43,11 +43,30 @@ const LINKS = {
     icon: HourglassOutlined,
     route: '/worktime',
   },
+  RAISES: {
+    title: 'Raises',
+    icon: ArrowUpOutlined,
+    route: '/raises',
+  },
 };
 
 const LINKS_MAP = {
-  [USER_ROLE.ADMIN]: [LINKS.USERS, LINKS.ACCOUNTS, LINKS.PROJECTS, LINKS.WORKTIME, LINKS.CLIENTS, LINKS.BUDGET],
-  [USER_ROLE.MANAGER]: [LINKS.USERS_LIST, LINKS.ACCOUNTS, LINKS.PROJECTS, LINKS.CLIENTS],
+  [USER_ROLE.ADMIN]: [
+    LINKS.USERS,
+    LINKS.ACCOUNTS,
+    LINKS.PROJECTS,
+    LINKS.CLIENTS,
+    LINKS.WORKTIME,
+    LINKS.RAISES,
+    LINKS.BUDGET,
+  ],
+  [USER_ROLE.MANAGER]: [
+    LINKS.USERS_LIST,
+    LINKS.ACCOUNTS,
+    LINKS.PROJECTS,
+    LINKS.CLIENTS,
+    LINKS.RAISES,
+  ],
 };
 
 const Sidebar = ({ collapsed }) => {

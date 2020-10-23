@@ -1,10 +1,10 @@
 import AuthorizedLayout from '../../components/common/Layout/Authorized';
-import Expenses from '../../components/Expenses';
+import Raises from '../../components/Raises';
 
-const ExpensesPage = () => (
+const RaisesPage = () => (
   <AuthorizedLayout title='dygit'>
-    <Expenses />
+    <Raises />
   </AuthorizedLayout>
 );
 
-export default ExpensesPage;
+export default RaisesPage;
