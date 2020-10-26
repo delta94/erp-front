@@ -57,7 +57,7 @@ const AvatarArea = () => {
   return (
     <Dropdown overlay={menu}>
       <div className={styles.avatarWrap}>
-        <Avatar style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />
+        <Avatar style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} src={user?.avatar?.url} />
         <span>{ user?.name }</span>
       </div>
     </Dropdown>
